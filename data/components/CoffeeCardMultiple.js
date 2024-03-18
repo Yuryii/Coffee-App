@@ -32,10 +32,11 @@ const CoffeeCardMultiple = ({ image, name, roasted, ingredient, sizes }) => {
                 </View>
             </View>
             <FlatList
+                style={styles.sizesContainer}
                 data={data}
                 renderItem={({ item }) => <SizeCart size={item.size} price={item.price} style={styles.sizeContainer} />}
                 keyExtractor={item => item.size + item.price}
-                ItemSeparatorComponent={() => (<View style={{height: 6}}></View>)}
+                ItemSeparatorComponent={() => (<View style={{ height: 6 }}></View>)}
                 scrollEnabled={false}
             />
         </LinearGradient>
@@ -46,7 +47,7 @@ const styles = StyleSheet.create({
         backgroundColor: Color,
         padding: wp(3),
         borderRadius: wp(7),
-        gap: wp(2),
+        
     },
     whiteText: {
         color: Color.whiteHex
@@ -89,6 +90,9 @@ const styles = StyleSheet.create({
     },
     sizeContainer: {
         alignSelf: 'center'
+    },
+    sizesContainer: { 
+        marginTop: hp(1.5)
     }
 })
 export default CoffeeCardMultiple
