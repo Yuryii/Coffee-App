@@ -9,10 +9,27 @@ import { MaterialCommunityIcons } from '@expo/vector-icons';
 import AddToCart from '../components/AddToCart';
 import { FontAwesome6 } from '@expo/vector-icons';
 import { useEffect } from 'react';
+import { useDispatch } from 'react-redux';
 import {widthPercentageToDP as wp, heightPercentageToDP as hp} from 'react-native-responsive-screen';
 const CoffeeDetailsScreen = ({ route, navigation }) => {
   const coffee = BeansData.find(x => x.id === route.params.id)
   const [size, setSize] = useState('250gm')
+  const dispatch = useDispatch()
+  const handleAddBean = () => {
+    const id = coffee.id;
+    switch(id)
+    {
+      case '250gm':
+      dispatch(addSize250gm(id))  
+      break;
+      case '500gm':
+      dispatch(addSize1000gm(id))  
+      break;
+      case '1000gm':
+      dispatch(addSize1000gm(id))  
+      break;
+    }
+  }
   const handleChooseSize = (s) => {
     size === s ? setSize(null) : setSize(s)
   }
@@ -101,7 +118,7 @@ const CoffeeDetailsScreen = ({ route, navigation }) => {
             )}
           />
         </View>
-        <AddToCart title='Price' textButton='Add to Cart' price={price}/>
+        <AddToCart title='Price' textButton='Add to Cart' price={price} onPress={handleAddBean}/>
       </View>
     </View>
   )

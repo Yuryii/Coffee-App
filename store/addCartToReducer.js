@@ -93,14 +93,79 @@ export const addCartToReducer = createSlice({
       }
     },
     addSize250gm: (state, action) => {
-      const bean = state.beans.find(item => item.id === action.payload.idBean)
-      if (state.cart.some(item => item.id === bean.id && item.prices.size === bean.prices.size)) {
-        alert("This bean is already in the cart.")
-        return state;
+      let id = action.payload.idBean;
+      const coffee = state.beans.find(item => item.id === id)
+      coffeeHasBeenAddedToCart = state.cart.find(item => item.id === id)
+      if (!coffeeHasBeenAddedToCart) {
+        const coffeeM = coffee.prices.filter(item => item.size === '250gm')
+        const newCoffee = { ...coffee, prices: [coffeeM[0]] }
+        state.cart = [...state.cart, newCoffee]
       }
-      const bean250mg = bean.prices.filter(item => item.size === '250gm')
-      bean.prices = bean250mg[0]
-      state.cart = [...state.cart, bean]
+      else {
+        const hasCoffeeAddedToCartSizeM = coffeeHasBeenAddedToCart.prices.some(item => item.size === '250gm')
+        if (hasCoffeeAddedToCartSizeM) {
+          alert('san pham voi size nay da co roi- tang so luong them 1')
+          return state;
+        }
+        else {
+          // add size moi vao cung san pham
+          const newCoffee = state.coffees.find(item => item.id === id)
+          const coffeeM = newCoffee.prices.filter(item => item.size === '250gm')
+          const index = state.cart.findIndex(item => item.id === id)
+          state.cart[index].prices = [...state.cart[index].prices, coffeeM[0]]
+
+        }
+      }
+    },
+    addSize500gm: (state, action) => {
+      let id = action.payload.idBean;
+      const coffee = state.beans.find(item => item.id === id)
+      coffeeHasBeenAddedToCart = state.cart.find(item => item.id === id)
+      if (!coffeeHasBeenAddedToCart) {
+        const coffeeM = coffee.prices.filter(item => item.size === '500gm')
+        const newCoffee = { ...coffee, prices: [coffeeM[0]] }
+        state.cart = [...state.cart, newCoffee]
+      }
+      else {
+        const hasCoffeeAddedToCartSizeM = coffeeHasBeenAddedToCart.prices.some(item => item.size === '500gm')
+        if (hasCoffeeAddedToCartSizeM) {
+          alert('san pham voi size nay da co roi- tang so luong them 1')
+          return state;
+        }
+        else {
+          // add size moi vao cung san pham
+          const newCoffee = state.coffees.find(item => item.id === id)
+          const coffeeM = newCoffee.prices.filter(item => item.size === '500gm')
+          const index = state.cart.findIndex(item => item.id === id)
+          state.cart[index].prices = [...state.cart[index].prices, coffeeM[0]]
+
+        }
+      }
+    },
+    addSize1000gm: (state, action) => {
+      let id = action.payload.idBean;
+      const coffee = state.beans.find(item => item.id === id)
+      coffeeHasBeenAddedToCart = state.cart.find(item => item.id === id)
+      if (!coffeeHasBeenAddedToCart) {
+        const coffeeM = coffee.prices.filter(item => item.size === '1000gm')
+        const newCoffee = { ...coffee, prices: [coffeeM[0]] }
+        state.cart = [...state.cart, newCoffee]
+      }
+      else {
+        const hasCoffeeAddedToCartSizeM = coffeeHasBeenAddedToCart.prices.some(item => item.size === '1000gm')
+        if (hasCoffeeAddedToCartSizeM) {
+          alert('san pham voi size nay da co roi- tang so luong them 1')
+          return state;
+        }
+        else {
+          // add size moi vao cung san pham
+          const newCoffee = state.coffees.find(item => item.id === id)
+          const coffeeM = newCoffee.prices.filter(item => item.size === '1000gm')
+          const index = state.cart.findIndex(item => item.id === id)
+          state.cart[index].prices = [...state.cart[index].prices, coffeeM[0]]
+
+        }
+      }
     },
   },
 })
