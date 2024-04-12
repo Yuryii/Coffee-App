@@ -18,7 +18,7 @@ const CoffeeData = [
       favourite: false,
       type: 'Coffee',
       index: 0,
-    },
+    }, 
     {
       id: 'C2',
       name: 'Americano',

@@ -17,7 +17,7 @@ const CoffeeCardMultiple = ({ image, name, roasted, ingredient, sizes }) => {
         >
             <View style={[styles.headerContainer]}>
                 <TouchableOpacity >
-                    <Image source={image} style={styles.image} />
+                    <Image source={{uri: image}} style={styles.image} />
                 </TouchableOpacity>
                 <View>
                     <View style={styles.descriptionContainer}>

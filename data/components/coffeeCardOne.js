@@ -14,7 +14,7 @@ const CoffeeCardOne = ({ image, name, size, price, description }) => {
             end={{ x: 1, y: 1 }}
         >
             <View style={[styles.headerContainer]}>
-                <Image source={image} style={styles.image} />
+                <Image source={{uri: image}} style={styles.image} />
                 <View>
                     <View style={styles.descriptionContainer}>
                         <Text style={[styles.whiteText, styles.name]}>{name}</Text>

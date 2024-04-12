@@ -1,11 +1,24 @@
-import { createSlice } from '@reduxjs/toolkit'
-import CoffeeData from "../data/data/CoffeeData";
-import BeansData from "../data/data/BeanData";
+import { createSlice, createAsyncThunk } from '@reduxjs/toolkit'
+import { fetchDataFromFirebase } from './rootReducer'
+import app from '../data/firebaseConfig';
+import getCartData from '../data/data/getCartData';
+export const fetchCartFromFirebase = createAsyncThunk(
+  'data/cartData',
+  async (email) => {
+    const response = await getCartData(email);
+    return response;
+  }
+);
 
 const initialState = {
-  coffees: CoffeeData,
-  beans: BeansData,
-  cart: []
+  data: [],
+  coffeData: [],
+  beansData: [],
+  cart: [],
+  status: 'idle',
+  error: null,
+  statusCart: 'idle',
+  errorCart: null,
 }
 
 export const addCartToReducer = createSlice({
@@ -14,26 +27,25 @@ export const addCartToReducer = createSlice({
   reducers: {
     addSizeS: (state, action) => {
       let id = action.payload.idCoffee;
-      const coffee = state.coffees.find(item => item.id === id)
+      const coffee = state.coffeData.find(item => item.id === id)
       const coffeeHasBeenAddedToCart = state.cart.find(item => item.id === id)
       if (!coffeeHasBeenAddedToCart) {
-        const coffeeS = coffee.prices.filter(item => item.size === 'S')
-        const newCoffee = { ...coffee, prices: [coffeeS[0]] };
+        const coffeeS = coffee.price.filter(item => item.size === 'S')
+        const newCoffee = { ...coffee, price: [coffeeS[0]] };
         state.cart = [...state.cart, newCoffee];
-
       }
       else {
-        const hasCoffeeAddedToCartSizeS = coffeeHasBeenAddedToCart.prices.some(item => item.size === 'S');
+        const hasCoffeeAddedToCartSizeS = coffeeHasBeenAddedToCart.price.some(item => item.size === 'S');
         if (hasCoffeeAddedToCartSizeS) {
           alert('Sản phẩm với size này đã có rồi - tăng số lượng thêm 1');
           return state;
         }
         else {
           // Thêm size mới vào cùng sản phẩm
-          let sizeS = coffee.prices[0];
+          let sizeS = coffee.price[0];
           const updatedCart = state.cart.map(item => {
             if (item.id === id) {
-              return { ...item, prices: [...item.prices, sizeS] };
+              return { ...item, price: [...item.price, sizeS] };
             }
             return item;
           });
@@ -44,40 +56,46 @@ export const addCartToReducer = createSlice({
     ,
     addSizeM: (state, action) => {
       let id = action.payload.idCoffee;
-      const coffee = state.coffees.find(item => item.id === id)
+      const coffee = state.coffeData.find(item => item.id === id)
       coffeeHasBeenAddedToCart = state.cart.find(item => item.id === id)
       if (!coffeeHasBeenAddedToCart) {
-        const coffeeM = coffee.prices.filter(item => item.size === 'M')
-        const newCoffee = { ...coffee, prices: [coffeeM[0]] }
+        const coffeeM = coffee.price.filter(item => item.size === 'M')
+        const newCoffee = { ...coffee, price: [coffeeM[0]] }
         state.cart = [...state.cart, newCoffee]
       }
       else {
-        const hasCoffeeAddedToCartSizeM = coffeeHasBeenAddedToCart.prices.some(item => item.size === 'M')
+        const hasCoffeeAddedToCartSizeM = coffeeHasBeenAddedToCart.price.some(item => item.size === 'M')
         if (hasCoffeeAddedToCartSizeM) {
           alert('san pham voi size nay da co roi- tang so luong them 1')
           return state;
         }
         else {
           // add size moi vao cung san pham
-          const newCoffee = state.coffees.find(item => item.id === id)
-          const coffeeM = newCoffee.prices.filter(item => item.size === 'M')
+          const newCoffee = state.coffeData.find(item => item.id === id)
+          const coffeeM = newCoffee.price.filter(item => item.size === 'M')
           const index = state.cart.findIndex(item => item.id === id)
-          state.cart[index].prices = [...state.cart[index].prices, coffeeM[0]]
+          state.cart[index].price = [...state.cart[index].price, coffeeM[0]]
 
         }
       }
+      const db = getFirestore(app);
+      const email = state.user.email;
+      const cartCollectionRef = collection(db, 'cart');
+      state.cart.forEach(async (item) => {
+        await addDoc(cartCollectionRef, { idProduct: item.id, email: email, price: item.price });
+      });
     },
     addSizeL: (state, action) => {
       let id = action.payload.idCoffee;
       const coffee = state.coffees.find(item => item.id === id)
       coffeeHasBeenAddedToCart = state.cart.find(item => item.id === id)
       if (!coffeeHasBeenAddedToCart) {
-        const coffeeM = coffee.prices.filter(item => item.size === 'L')
-        const newCoffee = { ...coffee, prices: [coffeeM[0]] }
+        const coffeeM = coffee.price.filter(item => item.size === 'L')
+        const newCoffee = { ...coffee, price: [coffeeM[0]] }
         state.cart = [...state.cart, newCoffee]
       }
       else {
-        const hasCoffeeAddedToCartSizeM = coffeeHasBeenAddedToCart.prices.some(item => item.size === 'L')
+        const hasCoffeeAddedToCartSizeM = coffeeHasBeenAddedToCart.price.some(item => item.size === 'L')
         if (hasCoffeeAddedToCartSizeM) {
           alert('san pham voi size nay da co roi- tang so luong them 1')
           return state;
@@ -85,9 +103,9 @@ export const addCartToReducer = createSlice({
         else {
           // add size moi vao cung san pham
           const newCoffee = state.coffees.find(item => item.id === id)
-          const coffeeM = newCoffee.prices.filter(item => item.size === 'L')
+          const coffeeM = newCoffee.price.filter(item => item.size === 'L')
           const index = state.cart.findIndex(item => item.id === id)
-          state.cart[index].prices = [...state.cart[index].prices, coffeeM[0]]
+          state.cart[index].price = [...state.cart[index].price, coffeeM[0]]
 
         }
       }
@@ -97,12 +115,12 @@ export const addCartToReducer = createSlice({
       const coffee = state.beans.find(item => item.id === id)
       coffeeHasBeenAddedToCart = state.cart.find(item => item.id === id)
       if (!coffeeHasBeenAddedToCart) {
-        const coffeeM = coffee.prices.filter(item => item.size === '250gm')
-        const newCoffee = { ...coffee, prices: [coffeeM[0]] }
+        const coffeeM = coffee.price.filter(item => item.size === '250gm')
+        const newCoffee = { ...coffee, price: [coffeeM[0]] }
         state.cart = [...state.cart, newCoffee]
       }
       else {
-        const hasCoffeeAddedToCartSizeM = coffeeHasBeenAddedToCart.prices.some(item => item.size === '250gm')
+        const hasCoffeeAddedToCartSizeM = coffeeHasBeenAddedToCart.price.some(item => item.size === '250gm')
         if (hasCoffeeAddedToCartSizeM) {
           alert('san pham voi size nay da co roi- tang so luong them 1')
           return state;
@@ -110,9 +128,9 @@ export const addCartToReducer = createSlice({
         else {
           // add size moi vao cung san pham
           const newCoffee = state.coffees.find(item => item.id === id)
-          const coffeeM = newCoffee.prices.filter(item => item.size === '250gm')
+          const coffeeM = newCoffee.price.filter(item => item.size === '250gm')
           const index = state.cart.findIndex(item => item.id === id)
-          state.cart[index].prices = [...state.cart[index].prices, coffeeM[0]]
+          state.cart[index].price = [...state.cart[index].price, coffeeM[0]]
 
         }
       }
@@ -122,12 +140,12 @@ export const addCartToReducer = createSlice({
       const coffee = state.beans.find(item => item.id === id)
       coffeeHasBeenAddedToCart = state.cart.find(item => item.id === id)
       if (!coffeeHasBeenAddedToCart) {
-        const coffeeM = coffee.prices.filter(item => item.size === '500gm')
-        const newCoffee = { ...coffee, prices: [coffeeM[0]] }
+        const coffeeM = coffee.price.filter(item => item.size === '500gm')
+        const newCoffee = { ...coffee, price: [coffeeM[0]] }
         state.cart = [...state.cart, newCoffee]
       }
       else {
-        const hasCoffeeAddedToCartSizeM = coffeeHasBeenAddedToCart.prices.some(item => item.size === '500gm')
+        const hasCoffeeAddedToCartSizeM = coffeeHasBeenAddedToCart.price.some(item => item.size === '500gm')
         if (hasCoffeeAddedToCartSizeM) {
           alert('san pham voi size nay da co roi- tang so luong them 1')
           return state;
@@ -135,9 +153,9 @@ export const addCartToReducer = createSlice({
         else {
           // add size moi vao cung san pham
           const newCoffee = state.coffees.find(item => item.id === id)
-          const coffeeM = newCoffee.prices.filter(item => item.size === '500gm')
+          const coffeeM = newCoffee.price.filter(item => item.size === '500gm')
           const index = state.cart.findIndex(item => item.id === id)
-          state.cart[index].prices = [...state.cart[index].prices, coffeeM[0]]
+          state.cart[index].price = [...state.cart[index].price, coffeeM[0]]
 
         }
       }
@@ -147,12 +165,12 @@ export const addCartToReducer = createSlice({
       const coffee = state.beans.find(item => item.id === id)
       coffeeHasBeenAddedToCart = state.cart.find(item => item.id === id)
       if (!coffeeHasBeenAddedToCart) {
-        const coffeeM = coffee.prices.filter(item => item.size === '1000gm')
-        const newCoffee = { ...coffee, prices: [coffeeM[0]] }
+        const coffeeM = coffee.price.filter(item => item.size === '1000gm')
+        const newCoffee = { ...coffee, price: [coffeeM[0]] }
         state.cart = [...state.cart, newCoffee]
       }
       else {
-        const hasCoffeeAddedToCartSizeM = coffeeHasBeenAddedToCart.prices.some(item => item.size === '1000gm')
+        const hasCoffeeAddedToCartSizeM = coffeeHasBeenAddedToCart.price.some(item => item.size === '1000gm')
         if (hasCoffeeAddedToCartSizeM) {
           alert('san pham voi size nay da co roi- tang so luong them 1')
           return state;
@@ -160,17 +178,44 @@ export const addCartToReducer = createSlice({
         else {
           // add size moi vao cung san pham
           const newCoffee = state.coffees.find(item => item.id === id)
-          const coffeeM = newCoffee.prices.filter(item => item.size === '1000gm')
+          const coffeeM = newCoffee.price.filter(item => item.size === '1000gm')
           const index = state.cart.findIndex(item => item.id === id)
-          state.cart[index].prices = [...state.cart[index].prices, coffeeM[0]]
+          state.cart[index].price = [...state.cart[index].price, coffeeM[0]]
 
         }
       }
     },
   },
+  extraReducers: (builder) => {
+    builder
+      .addCase(fetchDataFromFirebase.pending, (state) => {
+        state.status = 'loading';
+      })
+      .addCase(fetchDataFromFirebase.fulfilled, (state, action) => {
+        state.status = 'succeeded';
+        state.data = action.payload;
+        state.coffeData = state.data.filter((item) => item.type === 'Coffee');
+        state.beansData = state.data.filter((item) => item.type === 'Bean');
+      })
+      .addCase(fetchDataFromFirebase.rejected, (state, action) => {
+        state.status = 'failed';
+        state.error = action.error.message;
+      })
+      .addCase(fetchCartFromFirebase.pending, (state) => {
+        state.statusCart = 'loading';
+      })
+      .addCase(fetchCartFromFirebase.fulfilled, (state, action) => {
+        state.statusCart = 'succeeded';
+        state.cart = action.payload;
+      })
+      .addCase(fetchCartFromFirebase.rejected, (state, action) => {
+        state.errorCart = 'failed';
+        state.errorCart = action.error.message;
+      })
+  }
 })
 
 // Action creators are generated for each case reducer function
-export const { addSizeS, addSizeM, addSizeL, addSize250gm } = addCartToReducer.actions
+export const { addSizeS, addSizeM, addSizeL, addSize250gm, getUser } = addCartToReducer.actions
 
 export default addCartToReducer.reducer

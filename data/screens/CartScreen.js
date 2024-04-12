@@ -1,40 +1,58 @@
 import { View, Text, StyleSheet } from 'react-native'
-import React from 'react'
+import React, { useEffect } from 'react'
 import Color from '../theme/Color'
 import HeaderTabNavigationCustom from '../components/headerTabNavigationCustom'
 import CoffeeCardMultiple from '../components/CoffeeCardMultiple'
 import CoffeeCardOne from '../components/coffeeCardOne'
-import { FlatList, ScrollView } from 'react-native-gesture-handler'
+import { FlatList } from 'react-native-gesture-handler'
 import AddToCart from '../components/AddToCart';
 import { widthPercentageToDP as wp, heightPercentageToDP as hp } from 'react-native-responsive-screen';
 import { useSelector } from 'react-redux'
+import { useState } from 'react'
 const CartScreen = ({ navigation }) => {
   const cart = useSelector((state) => state.addCartToReducer.cart)
-  console.log(cart)
+  const status = useSelector((state) => state.addCartToReducer.statusCart)
+  const error = useSelector((state) => state.addCartToReducer.errorCart)
+  const [totalPrice, setTotalPrice] = useState(0)
+  // total price cart
+  useEffect(() => {
+    let totalPrice = 0;
+    cart.forEach((item) => {
+      item.cart.forEach((item2) => {
+        item2.price.forEach((item3) => {
+          console.log('item3.price' + item3.price)
+          totalPrice += parseFloat(item3.price)
+        })
+      })
+    })
+    console.log(totalPrice)
+    setTotalPrice(totalPrice)
+    console.log(JSON.stringify(cart[0].cart, null, 2))
+  }, [])
   return (
     <View style={styles.container}>
       <HeaderTabNavigationCustom screenName='Cart' />
       {/*  */}
 
       <FlatList
-        data={cart}
+        data={cart[0].cart}
         renderItem={({ item }) => (
-          item.prices.length > 1
+          item.price.length > 1
             ?
-            <CoffeeCardMultiple 
-            sizes={item.prices} 
-            image={item.imagelink_square}
-            name={item.name}
-            ingredient={item.special_ingredient}
-            roasted={item.roasted}
+            <CoffeeCardMultiple
+              sizes={item.price}
+              image={item.imageLink_square}
+              name={item.name}
+              ingredient={item.special_ingredients}
+              roasted={item.roasted}
             />
             :
             <CoffeeCardOne
               name={item.name}
-              description={item.special_ingredient}
-              size={item.prices[0].size}
-              image={item.imagelink_square}
-              price={item.prices[0].price} />
+              description={item.special_ingredients}
+              size={item.price[0].size}
+              image={item.imageLink_square}
+              price={item.price[0].price} />
         )}
         keyExtractor={item => item.id}
         ItemSeparatorComponent={() => (
@@ -42,7 +60,7 @@ const CartScreen = ({ navigation }) => {
         )
         }
       />
-      <AddToCart title='Total Price' price='10.40' textButton='Pay' onPress={() => navigation.navigate('PaymentScreenStack')} />
+      <AddToCart title='Total Price' price={totalPrice} textButton='Pay' onPress={() => cart.length === 0 ? alert('123') : navigation.navigate('PaymentScreen', { price: totalPrice })} />
     </View>
   )
 }

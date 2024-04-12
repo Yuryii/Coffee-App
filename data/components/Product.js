@@ -13,7 +13,7 @@ const Product = ({ rating, image, name, ingredient, price, onPress, add }) => {
         style={styles.container}
         start={{ x: 0, y: 0 }}
         end={{ x: 1, y: 1 }}>
-        <Image style={[styles.image]} source={image} />
+        <Image source={{ uri: image }} style={styles.image} />
         <View style={styles.ratingContainer} >
           <AntDesign name="star" size={10} color={Color.orangeTextHex} style={{ marginLeft: 8 }} />
           <Text style={[styles.rating, styles.text]}>{rating}</Text>

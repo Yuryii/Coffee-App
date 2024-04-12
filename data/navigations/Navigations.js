@@ -13,7 +13,11 @@ import OrderHistoryScreen from '../screens/OrderHistoryScreen';
 import PaymentScreen from '../screens/PaymentScreen';
 import Color from '../theme/Color';
 import { FontAwesome } from '@expo/vector-icons';
-import { widthPercentageToDP as wp, heightPercentageToDP as hp } from 'react-native-responsive-screen';
+import { widthPercentageToDP as wp, heightPercentageToDP as hp } from 'react-native-responsive-screen'; import { getHeaderTitle } from '@react-navigation/elements';
+import CustomDrawer from '../components/CustomDrawer';
+import AddScreen from '../screens/AddScreen';
+import { MaterialIcons } from '@expo/vector-icons';
+
 const Stack = createNativeStackNavigator()
 const Tab = createBottomTabNavigator();
 const Drawer = createDrawerNavigator();
@@ -22,20 +26,13 @@ const ProductStack = () => {
     return (
         <Stack.Navigator >
             <Stack.Screen name="HomeTab" component={MainTab} options={{ headerShown: false }} />
-            <Stack.Screen name="BeanDetailScreen" component={BeanDetailsScreen} options={{ headerShown: false }}/>
-            <Stack.Screen name="CoffeeDetailScreen" component={CoffeeDetailsScreen} options={{ headerShown: false }}/>
-            <Stack.Screen name="PaymentScreenStack" component={PaymentScreenStack} options={{ headerShown: false }}/>
+            <Stack.Screen name="BeanDetailScreen" component={BeanDetailsScreen} options={{ headerShown: false }} />
+            <Stack.Screen name="CoffeeDetailScreen" component={CoffeeDetailsScreen} options={{ headerShown: false }} />
+            <Stack.Screen name="PaymentScreen" component={PaymentScreen} options={{ headerShown: false }} />
         </Stack.Navigator>
     )
 }
 
-const CartStackStack = () => {
-    return (
-        <Stack.Navigator>
-            <Stack.Screen name="CardScreen" component={CartScreen} options={{ headerShown: false }} />
-        </Stack.Navigator>
-    )
-}
 
 const FavouriteStack = () => {
     return (
@@ -48,13 +45,6 @@ const OrderHistoryStack = () => {
     return (
         <Stack.Navigator>
             <Stack.Screen name="OrderHistoryScreen" component={OrderHistoryScreen} options={{ headerShown: false }} />
-        </Stack.Navigator>
-    )
-}
-const PaymentScreenStack = () => {
-    return (
-        <Stack.Navigator>
-            <Stack.Screen name="PaymentScreen" component={PaymentScreen} options={{ headerShown: false }} />
         </Stack.Navigator>
     )
 }
@@ -79,7 +69,7 @@ const MainTab = () => {
                         iconName = focused
                             ? 'home'
                             : 'home';
-                    } else if (route.name === 'CartStackStack') {
+                    } else if (route.name === 'CartScreen') {
                         iconName = focused ? 'shopping-cart' : 'shopping-cart';
                     }
                     else if (route.name === 'FavouriteStack') {
@@ -95,8 +85,8 @@ const MainTab = () => {
                 tabBarInactiveTintColor: 'gray',
             })}
         >
-            <Tab.Screen name="HomeScreen" component={HomeScreen} options={{ headerShown: false }}/>
-            <Tab.Screen name="CartStackStack" component={CartStackStack} />
+            <Tab.Screen name="HomeScreen" component={HomeScreen} />
+            <Tab.Screen name="CartScreen" component={CartScreen} />
             <Tab.Screen name="FavouriteStack" component={FavouriteStack} />
             <Tab.Screen name="OrderHistoryStack" component={OrderHistoryStack} />
         </Tab.Navigator>
@@ -106,8 +96,32 @@ const MainTab = () => {
 export default function Navigation() {
     return (
         <NavigationContainer >
-            <Drawer.Navigator>
-                <Drawer.Screen name='MainTab' component={ProductStack} options={{ headerShown: false }} />
+            <Drawer.Navigator
+                drawerContent={props => <CustomDrawer {...props} />}
+                screenOptions={{ 
+                    drawerLabelStyle: { marginLeft: -25, fontSize: 17 }, 
+                    drawerActiveBackgroundColor: 'white',
+                    drawerActiveTintColor: 'black',
+                    drawerInactiveTintColor: 'white',
+                } 
+            }
+            >
+                <Drawer.Screen name='Home' component={ProductStack}
+                    options={{
+                        headerShown: false,
+                        drawerIcon: ({ color, focused }) => (
+                            <FontAwesome name="home" size={24} color={focused ? "black" : 'white'} />
+                        )
+                    }}
+
+                />
+                <Drawer.Screen name='Add' component={AddScreen}
+                    options={{
+                        drawerIcon: ({ color, focused }) => (
+                            <MaterialIcons name="add-box" size={24} color={focused ? "black" : "white"} />
+                        ),
+                        headerShown: false
+                    }} />
             </Drawer.Navigator>
         </NavigationContainer>
     );

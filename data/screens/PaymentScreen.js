@@ -8,11 +8,12 @@ import Payment from '../components/Payment';
 import Payment2 from '../components/Payment2';
 import AddToCart from '../components/AddToCart';
 
-const PaymentScreen = ({ navigation }) => {
+const PaymentScreen = ({ navigation, route }) => {
   const [payment, setPayment] = useState('Visa')
   const handlePress = (name) => {
     setPayment(name)
   }
+
   return (
     <View style={styles.container}>
       <HeaderGoBackStack name='Payment' onPressBackButton={() => navigation.goBack()} />
@@ -24,7 +25,7 @@ const PaymentScreen = ({ navigation }) => {
         <Payment2 image={require('../images/app_images/amazonpay.png')} name='Amazone' onPress={() => handlePress('Amazon')} isSelected={payment === 'Amazon'} />
       </View>
       <View style={{marginTop: hp(5)}}>
-        <AddToCart title='Price' price='4.20' textButton='Pay from Credit Card' />
+        <AddToCart title='Price' price={route.params.price} textButton='Pay from Credit Card' />
       </View>
     </View>
   )

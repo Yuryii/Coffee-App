@@ -1,6 +1,5 @@
 import { View, Text, Image, StyleSheet } from 'react-native'
 import React, { useEffect, useState } from 'react'
-import CoffeeData from '../data/CoffeeData'
 import { FontAwesome } from '@expo/vector-icons';
 import { AntDesign } from '@expo/vector-icons';
 import Color from '../theme/Color';
@@ -11,9 +10,11 @@ import AddToCart from '../components/AddToCart';
 import {widthPercentageToDP as wp, heightPercentageToDP as hp} from 'react-native-responsive-screen';
 import {useDispatch} from 'react-redux'
 import { addSizeS, addSizeM, addSizeL } from '../../store/addCartToReducer';
+import { useSelector } from 'react-redux';
 const CoffeeDetailsScreen = ({ route, navigation }) => {
   const dispatch = useDispatch()
-  const coffee = CoffeeData.find(x => x.id === route.params.id)
+  const coffeData = useSelector(state => state.rootReducer.coffeData)
+  const coffee = coffeData.find(x => x.id === route.params.id)
   const [size, setSize] = useState('S')
   const [price, setPrice] = useState(0)
   const addToCart = () => {
@@ -36,19 +37,19 @@ const CoffeeDetailsScreen = ({ route, navigation }) => {
   useEffect(() => {
     switch(size) {
       case 'S':
-        setPrice(coffee.prices[0].price)
+        setPrice(coffee.price[0].price)
         break;
       case 'M':
-        setPrice(coffee.prices[1].price)
+        setPrice(coffee.price[1].price)
         break;
       case 'L':
-        setPrice(coffee.prices[2].price)
+        setPrice(coffee.price[2].price)
         break;
     }
   },[size])
   return (
-    <View style={styles.container}>
-      <Image source={coffee.imagelink_portrait} style={{ position: 'absolute' }} />
+    <View >
+      <Image source={{uri: coffee.imageLink_portrait}} style={{ position: 'absolute', width: '100%', height: '61%' }} />
       <View style={styles.headerContainer}>
         <TouchableOpacity style={[styles.button, { marginRight: 285 }]} onPress={() => navigation.goBack()}>
           <AntDesign name="arrowleft" size={17} color={Color.greyTextHex} />
@@ -61,7 +62,7 @@ const CoffeeDetailsScreen = ({ route, navigation }) => {
         <View style={styles.titleContainer}>
           <View>
             <Text style={styles.name}>{coffee.name}</Text>
-            <Text style={[styles.typeText, { fontSize: 12 }]}>{coffee.special_ingredient}</Text>
+            <Text style={[styles.typeText, { fontSize: 12 }]}>{coffee.special_ingredients}</Text>
           </View>
           <View style={styles.typeContainer}>
             <View style={[styles.type, { marginRight: 20 }]}>
@@ -97,7 +98,7 @@ const CoffeeDetailsScreen = ({ route, navigation }) => {
         <View style={[{ gap: 5 }]}>
           <Text style={[styles.typeText, { fontSize: 14, fontWeight: '600' }]}>Size</Text>
           <FlatList
-            data={coffee.prices}
+            data={coffee.price}
             renderItem={({ item }) =>
             (
               <TouchableOpacity
