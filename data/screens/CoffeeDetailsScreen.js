@@ -7,35 +7,64 @@ import { FlatList, ScrollView, TouchableOpacity } from 'react-native-gesture-han
 import { Fontisto } from '@expo/vector-icons';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
 import AddToCart from '../components/AddToCart';
-import {widthPercentageToDP as wp, heightPercentageToDP as hp} from 'react-native-responsive-screen';
-import {useDispatch} from 'react-redux'
+import { widthPercentageToDP as wp, heightPercentageToDP as hp } from 'react-native-responsive-screen';
+import { useDispatch } from 'react-redux'
 import { addSizeS, addSizeM, addSizeL } from '../../store/addCartToReducer';
 import { useSelector } from 'react-redux';
+import { useUser } from "@clerk/clerk-react";
+import { getFirestore } from "firebase/firestore";
+import { collection, getDocs, query, where, updateDoc, addDoc, doc } from "firebase/firestore";
+import app from '../firebaseConfig';
 const CoffeeDetailsScreen = ({ route, navigation }) => {
+  const cart = useSelector(state => state.addCartToReducer.cart)
+  const { user } = useUser();
+  const email = user.primaryEmailAddress.emailAddress;
+  const db = getFirestore(app);
   const dispatch = useDispatch()
   const coffeData = useSelector(state => state.rootReducer.coffeData)
   const coffee = coffeData.find(x => x.id === route.params.id)
   const [size, setSize] = useState('S')
   const [price, setPrice] = useState(0)
+  useEffect(() => {
+    const cartCollectionRef = collection(db, 'cart');
+    getDocs(query(cartCollectionRef, where('email', '==', email)))
+      .then(querySnapshot => {
+        if (!querySnapshot.empty) {
+          let key = '';
+          querySnapshot.forEach((doc) => {
+            const docRef = doc.ref;
+            key = doc.id;
+          })
+          updateDoc(doc(db, 'cart', key), { cart: cart })
+            .then(() => {
+              console.log('updated');
+            })
+            .catch(error => console.error(error));
+        }
+        else if (querySnapshot.empty) {
+          addDoc(collection(db, 'cart'), { email: email, cart: cart })
+        }
+      });
+  }, [cart]);
   const addToCart = () => {
     const idCoffee = coffee.id
-    switch(size) {
-      case 'S': 
-      dispatch(addSizeS({idCoffee}))
-      break;
-      case 'M': 
-      dispatch(addSizeM({idCoffee}))
-      break;
-      case 'L': 
-      dispatch(addSizeL({idCoffee}))
-      break;
+    switch (size) {
+      case 'S':
+        dispatch(addSizeS({ idCoffee }))
+        break;
+      case 'M':
+        dispatch(addSizeM({ idCoffee }))
+        break;
+      case 'L':
+        dispatch(addSizeL({ idCoffee }))
+        break;
     }
   }
   const handleChooseSize = (sizez) => {
     size === sizez ? setSize(null) : setSize(sizez)
   }
   useEffect(() => {
-    switch(size) {
+    switch (size) {
       case 'S':
         setPrice(coffee.price[0].price)
         break;
@@ -46,10 +75,10 @@ const CoffeeDetailsScreen = ({ route, navigation }) => {
         setPrice(coffee.price[2].price)
         break;
     }
-  },[size])
+  }, [size])
   return (
     <View >
-      <Image source={{uri: coffee.imageLink_portrait}} style={{ position: 'absolute', width: '100%', height: '61%' }} />
+      <Image source={{ uri: coffee.imageLink_portrait }} style={{ position: 'absolute', width: '100%', height: '61%' }} />
       <View style={styles.headerContainer}>
         <TouchableOpacity style={[styles.button, { marginRight: 285 }]} onPress={() => navigation.goBack()}>
           <AntDesign name="arrowleft" size={17} color={Color.greyTextHex} />
@@ -102,8 +131,8 @@ const CoffeeDetailsScreen = ({ route, navigation }) => {
             renderItem={({ item }) =>
             (
               <TouchableOpacity
-                style={[styles.buttonSize, size === item.size ? {borderWidth: 2, borderColor: Color.orangeTextHex} : {    borderWidth: 0, borderColor: Color.background} ]}
-                onPress={() => { handleChooseSize(item.size) }}               
+                style={[styles.buttonSize, size === item.size ? { borderWidth: 2, borderColor: Color.orangeTextHex } : { borderWidth: 0, borderColor: Color.background }]}
+                onPress={() => { handleChooseSize(item.size) }}
               >
                 <Text style={[styles.typeText, { fontSize: hp(2) }]}>
                   {item.size}
@@ -111,14 +140,14 @@ const CoffeeDetailsScreen = ({ route, navigation }) => {
               </TouchableOpacity>
             )
             }
-            scrollEnabled = {false}
+            scrollEnabled={false}
             horizontal
             ItemSeparatorComponent={() => (
               <View style={{ width: wp(6) }} />
             )}
           />
         </View>
-        <AddToCart title='Price' price={price} textButton='Add to Cart' onPress={addToCart}/>
+        <AddToCart title='Price' price={price} textButton='Add to Cart' onPress={addToCart} />
       </View>
     </View>
   )

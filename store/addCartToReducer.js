@@ -25,6 +25,7 @@ export const addCartToReducer = createSlice({
   name: 'addCartToReducer',
   initialState,
   reducers: {
+    resetState: () => initialState,
     addSizeS: (state, action) => {
       let id = action.payload.idCoffee;
       const coffee = state.coffeData.find(item => item.id === id)
@@ -53,7 +54,7 @@ export const addCartToReducer = createSlice({
         }
       }
     }
-    ,
+     ,
     addSizeM: (state, action) => {
       let id = action.payload.idCoffee;
       const coffee = state.coffeData.find(item => item.id === id)
@@ -78,16 +79,11 @@ export const addCartToReducer = createSlice({
 
         }
       }
-      const db = getFirestore(app);
-      const email = state.user.email;
-      const cartCollectionRef = collection(db, 'cart');
-      state.cart.forEach(async (item) => {
-        await addDoc(cartCollectionRef, { idProduct: item.id, email: email, price: item.price });
-      });
+      
     },
     addSizeL: (state, action) => {
       let id = action.payload.idCoffee;
-      const coffee = state.coffees.find(item => item.id === id)
+      const coffee = state.coffeData.find(item => item.id === id)
       coffeeHasBeenAddedToCart = state.cart.find(item => item.id === id)
       if (!coffeeHasBeenAddedToCart) {
         const coffeeM = coffee.price.filter(item => item.size === 'L')
@@ -102,7 +98,7 @@ export const addCartToReducer = createSlice({
         }
         else {
           // add size moi vao cung san pham
-          const newCoffee = state.coffees.find(item => item.id === id)
+          const newCoffee = state.coffeData.find(item => item.id === id)
           const coffeeM = newCoffee.price.filter(item => item.size === 'L')
           const index = state.cart.findIndex(item => item.id === id)
           state.cart[index].price = [...state.cart[index].price, coffeeM[0]]
@@ -206,7 +202,8 @@ export const addCartToReducer = createSlice({
       })
       .addCase(fetchCartFromFirebase.fulfilled, (state, action) => {
         state.statusCart = 'succeeded';
-        state.cart = action.payload;
+        const cartData = action.payload;
+        state.cart = cartData[0].cart;
       })
       .addCase(fetchCartFromFirebase.rejected, (state, action) => {
         state.errorCart = 'failed';
@@ -216,6 +213,6 @@ export const addCartToReducer = createSlice({
 })
 
 // Action creators are generated for each case reducer function
-export const { addSizeS, addSizeM, addSizeL, addSize250gm, getUser } = addCartToReducer.actions
+export const { addSizeS, addSizeM, addSizeL, addSize250gm, getUser, resetState } = addCartToReducer.actions
 
 export default addCartToReducer.reducer

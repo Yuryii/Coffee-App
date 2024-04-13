@@ -17,25 +17,24 @@ const CartScreen = ({ navigation }) => {
   // total price cart
   useEffect(() => {
     let totalPrice = 0;
-    cart.forEach((item) => {
-      item.cart.forEach((item2) => {
-        item2.price.forEach((item3) => {
-          console.log('item3.price' + item3.price)
-          totalPrice += parseFloat(item3.price)
-        })
-      })
-    })
+     cart.forEach((item) => {
+         item.price.forEach((price) => {
+           console.log('price.price' + price.price)
+           totalPrice += parseFloat(price.price)
+       })
+     })
     console.log(totalPrice)
+    totalPrice = totalPrice.toFixed(2)
     setTotalPrice(totalPrice)
-    console.log(JSON.stringify(cart[0].cart, null, 2))
-  }, [])
+    console.log(JSON.stringify(cart, null, 2))
+  }, [cart])
   return (
     <View style={styles.container}>
       <HeaderTabNavigationCustom screenName='Cart' />
       {/*  */}
 
       <FlatList
-        data={cart[0].cart}
+        data={cart}
         renderItem={({ item }) => (
           item.price.length > 1
             ?
