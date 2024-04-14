@@ -36,14 +36,12 @@ const HomeScreen = ({ navigation }) => {
       .then(querySnapshot => {
         if (!querySnapshot.empty) {
           let key = '';
-          alert('da co email naysan pham trong gio hang');
           querySnapshot.forEach((doc) => {
             const docRef = doc.ref;
             key = doc.id;
           })
           updateDoc(doc(db, 'cart', key), { cart: cart })
             .then(() => {
-              console.log('updated');
             })
             .catch(error => console.error(error));
         }

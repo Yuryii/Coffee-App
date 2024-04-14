@@ -1,42 +1,56 @@
-import { View, Text, Image, StyleSheet } from 'react-native'
+import { View, Text, Image, StyleSheet, TouchableOpacity } from 'react-native'
 import React from 'react'
 import Color from '../theme/Color'
 import { LinearGradient } from 'expo-linear-gradient';
 import SizeCart from './sizeCart';
 import Quantity from './Quantity';
-import {widthPercentageToDP as wp, heightPercentageToDP as hp} from 'react-native-responsive-screen';
-const CoffeeCardOne = ({ image, name, size, price, description }) => {
+import { widthPercentageToDP as wp, heightPercentageToDP as hp } from 'react-native-responsive-screen';
+import { Swipeable } from 'react-native-gesture-handler';
+import { AntDesign } from '@expo/vector-icons';
+import { useDispatch } from 'react-redux';
+const CoffeeCardOne = ({ image, name, size, price, description, onDelete }) => {
+    const rightSwipe = () => {
+        return (
+            <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center', backgroundColor: 'red', borderRadius: 25 }}>
+                <TouchableOpacity >
+                    <AntDesign name="delete" size={60} color="white" />
+                </TouchableOpacity>
+            </View>
+        )
+    }
     return (
-        <LinearGradient
-            style={styles.container}
-            colors={['#252A32', '#0C0F14']}
-            start={{ x: 0, y: 0 }}
-            end={{ x: 1, y: 1 }}
-        >
-            <View style={[styles.headerContainer]}>
-                <Image source={{uri: image}} style={styles.image} />
-                <View>
-                    <View style={styles.descriptionContainer}>
-                        <Text style={[styles.whiteText, styles.name]}>{name}</Text>
-                        <Text style={[styles.greySubText, styles.description]}>{description}</Text>
-                        <View style={{flexDirection: 'row', gap: 8}}>
-                            <View style={styles.buttonSize}>
-                                <Text style={[styles.whiteText, { fontSize: hp(2.2) }]}>
-                                    {size}
+        <Swipeable renderRightActions={rightSwipe} onSwipeableOpen={onDelete }>
+            <LinearGradient
+                style={styles.container}
+                colors={['#252A32', '#0C0F14']}
+                start={{ x: 0, y: 0 }}
+                end={{ x: 1, y: 1 }}
+            >
+                <View style={[styles.headerContainer]}>
+                    <Image source={{ uri: image }} style={styles.image} />
+                    <View>
+                        <View style={styles.descriptionContainer}>
+                            <Text style={[styles.whiteText, styles.name]}>{name}</Text>
+                            <Text style={[styles.greySubText, styles.description]}>{description}</Text>
+                            <View style={{ flexDirection: 'row', gap: 8 }}>
+                                <View style={styles.buttonSize}>
+                                    <Text style={[styles.whiteText, { fontSize: hp(2.2) }]}>
+                                        {size}
+                                    </Text>
+                                </View>
+                                <Text style={[{ color: Color.orangeTextHex, fontSize: hp(2.5), fontWeight: 'bold' }]}>
+                                    $
+                                </Text>
+                                <Text style={[styles.whiteText, { fontSize: hp(2.5), fontWeight: '600', }]}>
+                                    {price}
                                 </Text>
                             </View>
-                            <Text style={[{ color: Color.orangeTextHex, fontSize: hp(2.5), fontWeight: 'bold' }]}>
-                                $
-                            </Text>
-                            <Text style={[styles.whiteText, { fontSize: hp(2.5), fontWeight: '600', }]}>
-                                {price}
-                            </Text>
-                        </View> 
-                        <Quantity/>
+                            <Quantity />
+                        </View>
                     </View>
                 </View>
-            </View>
-        </LinearGradient>
+            </LinearGradient>
+        </Swipeable>
     )
 }
 const styles = StyleSheet.create({

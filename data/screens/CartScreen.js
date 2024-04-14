@@ -9,10 +9,11 @@ import AddToCart from '../components/AddToCart';
 import { widthPercentageToDP as wp, heightPercentageToDP as hp } from 'react-native-responsive-screen';
 import { useSelector } from 'react-redux'
 import { useState } from 'react'
+import { deleteItem } from '../../store/addCartToReducer'
+import { useDispatch } from 'react-redux'
 const CartScreen = ({ navigation }) => {
+  const dispatch = useDispatch()
   const cart = useSelector((state) => state.addCartToReducer.cart)
-  const status = useSelector((state) => state.addCartToReducer.statusCart)
-  const error = useSelector((state) => state.addCartToReducer.errorCart)
   const [totalPrice, setTotalPrice] = useState(0)
   // total price cart
   useEffect(() => {
@@ -28,6 +29,9 @@ const CartScreen = ({ navigation }) => {
     setTotalPrice(totalPrice)
     console.log(JSON.stringify(cart, null, 2))
   }, [cart])
+  const handleDeleteCart = (id) => {
+    dispatch(deleteItem({ id }))
+  }
   return (
     <View style={styles.container}>
       <HeaderTabNavigationCustom screenName='Cart' />
@@ -44,6 +48,7 @@ const CartScreen = ({ navigation }) => {
               name={item.name}
               ingredient={item.special_ingredients}
               roasted={item.roasted}
+              onDelete={() => handleDeleteCart(item.id)}
             />
             :
             <CoffeeCardOne
@@ -51,7 +56,9 @@ const CartScreen = ({ navigation }) => {
               description={item.special_ingredients}
               size={item.price[0].size}
               image={item.imageLink_square}
-              price={item.price[0].price} />
+              price={item.price[0].price} 
+              onDelete={() => handleDeleteCart(item.id)}
+              />
         )}
         keyExtractor={item => item.id}
         ItemSeparatorComponent={() => (

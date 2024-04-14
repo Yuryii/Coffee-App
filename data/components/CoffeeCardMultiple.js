@@ -5,41 +5,54 @@ import { LinearGradient } from 'expo-linear-gradient';
 import SizeCart from './sizeCart';
 import { widthPercentageToDP as wp, heightPercentageToDP as hp } from 'react-native-responsive-screen';
 import { FlatList, TouchableOpacity } from 'react-native-gesture-handler';
-const CoffeeCardMultiple = ({ image, name, roasted, ingredient, sizes }) => {
+import { Swipeable } from 'react-native-gesture-handler'
+import { AntDesign } from '@expo/vector-icons';
+
+const CoffeeCardMultiple = ({ image, name, roasted, ingredient, sizes, onDelete }) => {
     const data = sizes;
-    var a = 0;
-    return (
-        <LinearGradient
-            style={styles.container}
-            colors={['#252A32', '#0C0F14']}
-            start={{ x: 0, y: 0 }}
-            end={{ x: 1, y: 1 }}
-        >
-            <View style={[styles.headerContainer]}>
-                <TouchableOpacity >
-                    <Image source={{uri: image}} style={styles.image} />
+    const rightSwipe = () => {
+        return (
+            <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center', backgroundColor: 'red', borderRadius: 25 }}>
+                <TouchableOpacity>
+                    <AntDesign name="delete" size={60} color="white" />
                 </TouchableOpacity>
-                <View>
-                    <View style={styles.descriptionContainer}>
-                        <Text style={[styles.whiteText, styles.name]}>{name}</Text>
-                        <Text style={[styles.greySubText, styles.description]}>{ingredient}</Text>
-                        <View style={[styles.roastedContainer]}>
-                            <Text style={[styles.greySubText, styles.roasted]}>
-                                {roasted}
-                            </Text>
+            </View>
+        )
+    }
+    return (
+        <Swipeable renderRightActions={rightSwipe} onSwipeableOpen={onDelete }>
+            <LinearGradient
+                style={styles.container}
+                colors={['#252A32', '#0C0F14']}
+                start={{ x: 0, y: 0 }}
+                end={{ x: 1, y: 1 }}
+            >
+                <View style={[styles.headerContainer]}>
+                    <TouchableOpacity >
+                        <Image source={{ uri: image }} style={styles.image} />
+                    </TouchableOpacity>
+                    <View>
+                        <View style={styles.descriptionContainer}>
+                            <Text style={[styles.whiteText, styles.name]}>{name}</Text>
+                            <Text style={[styles.greySubText, styles.description]}>{ingredient}</Text>
+                            <View style={[styles.roastedContainer]}>
+                                <Text style={[styles.greySubText, styles.roasted]}>
+                                    {roasted}
+                                </Text>
+                            </View>
                         </View>
                     </View>
                 </View>
-            </View>
-            <FlatList
-                style={styles.sizesContainer}
-                data={data}
-                renderItem={({ item }) => <SizeCart size={item.size} price={item.price} style={styles.sizeContainer} />}
-                keyExtractor={item => item.size + item.price}
-                ItemSeparatorComponent={() => (<View style={{ height: 6 }}></View>)}
-                scrollEnabled={false}
-            />
-        </LinearGradient>
+                <FlatList
+                    style={styles.sizesContainer}
+                    data={data}
+                    renderItem={({ item }) => <SizeCart size={item.size} price={item.price} style={styles.sizeContainer} />}
+                    keyExtractor={item => item.size + item.price}
+                    ItemSeparatorComponent={() => (<View style={{ height: 6 }}></View>)}
+                    scrollEnabled={false}
+                />
+            </LinearGradient>
+        </Swipeable>
     )
 }
 const styles = StyleSheet.create({
@@ -47,7 +60,7 @@ const styles = StyleSheet.create({
         backgroundColor: Color,
         padding: wp(3),
         borderRadius: wp(7),
-        
+
     },
     whiteText: {
         color: Color.whiteHex
@@ -91,7 +104,7 @@ const styles = StyleSheet.create({
     sizeContainer: {
         alignSelf: 'center'
     },
-    sizesContainer: { 
+    sizesContainer: {
         marginTop: hp(1.5)
     }
 })

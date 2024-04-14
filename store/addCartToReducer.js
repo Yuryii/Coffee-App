@@ -181,6 +181,10 @@ export const addCartToReducer = createSlice({
         }
       }
     },
+    deleteItem: (state, action) => {
+      const id = action.payload.id;
+      state.cart = state.cart.filter(item => item.id !== id);
+    }
   },
   extraReducers: (builder) => {
     builder
@@ -213,6 +217,6 @@ export const addCartToReducer = createSlice({
 })
 
 // Action creators are generated for each case reducer function
-export const { addSizeS, addSizeM, addSizeL, addSize250gm, getUser, resetState } = addCartToReducer.actions
+export const { addSizeS, addSizeM, addSizeL, addSize250gm, getUser, resetState, deleteItem } = addCartToReducer.actions
 
 export default addCartToReducer.reducer
