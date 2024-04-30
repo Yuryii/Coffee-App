@@ -2,18 +2,21 @@ import { View, Text, StyleSheet } from 'react-native'
 import React from 'react'
 import Color from '../theme/Color'
 import Quantity from './Quantity'
+import { useSelector } from 'react-redux'
 import { widthPercentageToDP as wp, heightPercentageToDP as hp } from 'react-native-responsive-screen';
-const SizeCart = (props) => {
+
+const SizeCart = ({size, price, incrementQuantity, decrementQuantity, quantity}) => {
+ 
     return (
         <View style={styles.container}>
             <View style={styles.size}>
-                <Text style={styles.text}>{props.size}</Text>
+                <Text style={styles.text}>{size}</Text>
             </View>
             <View style={{ flexDirection: 'row', alignItems: 'center' }}>
                 <Text style={[styles.text, { color: Color.orangeTextHex, fontWeight: 'bold' }]}>$ </Text>
-                <Text style={[styles.text]}>{props.price}</Text>
+                <Text style={[styles.text]}>{price}</Text>
             </View>
-            <Quantity />
+            <Quantity incrementQuantity={incrementQuantity} decrementQuantity={decrementQuantity} quantity={quantity}/>
         </View>
     )
 }

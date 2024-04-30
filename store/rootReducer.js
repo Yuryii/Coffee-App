@@ -15,10 +15,19 @@ const dataSlice = createSlice({
     data: [],
     coffeData: [],
     beansData: [],
+    coffeeDataSearched: [],
     status: 'idle',
     error: null,
   },
-  reducers: {},
+  reducers: {
+    searchItem: (state, action) => {
+      if (action.payload.text === 'All') {
+        state.coffeData = state.data.filter((item) => item.type === 'Coffee');
+        return;
+      }
+      state.coffeData = state.data.filter((item) => item.type === 'Coffee' && item.name.toLowerCase().includes(action.payload.text.toLowerCase()));
+    },
+  },
   extraReducers: (builder) => {
     builder
       .addCase(fetchDataFromFirebase.pending, (state) => {
@@ -29,6 +38,7 @@ const dataSlice = createSlice({
         state.data = action.payload;
         state.coffeData = state.data.filter((item) => item.type === 'Coffee');
         state.beansData = state.data.filter((item) => item.type === 'Bean');
+        state.coffeeDataSearched = state.coffeData;
       })
       .addCase(fetchDataFromFirebase.rejected, (state, action) => {
         state.status = 'failed';
@@ -37,4 +47,5 @@ const dataSlice = createSlice({
   },
 });
 
+export const { searchItem } = dataSlice.actions;
 export default dataSlice.reducer;

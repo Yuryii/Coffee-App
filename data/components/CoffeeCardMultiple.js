@@ -7,8 +7,12 @@ import { widthPercentageToDP as wp, heightPercentageToDP as hp } from 'react-nat
 import { FlatList, TouchableOpacity } from 'react-native-gesture-handler';
 import { Swipeable } from 'react-native-gesture-handler'
 import { AntDesign } from '@expo/vector-icons';
+import { useDispatch } from 'react-redux';
+import { incrementQuantity } from '../../store/addCartToReducer'
+import { decrementQuantity } from '../../store/addCartToReducer'
 
-const CoffeeCardMultiple = ({ image, name, roasted, ingredient, sizes, onDelete }) => {
+const CoffeeCardMultiple = ({ image, name, roasted, ingredient, sizes, onDelete, id }) => {
+    const dispatch = useDispatch()
     const data = sizes;
     const rightSwipe = () => {
         return (
@@ -20,7 +24,7 @@ const CoffeeCardMultiple = ({ image, name, roasted, ingredient, sizes, onDelete 
         )
     }
     return (
-        <Swipeable renderRightActions={rightSwipe} onSwipeableOpen={onDelete }>
+        <Swipeable renderRightActions={rightSwipe} onSwipeableOpen={onDelete}>
             <LinearGradient
                 style={styles.container}
                 colors={['#252A32', '#0C0F14']}
@@ -46,7 +50,17 @@ const CoffeeCardMultiple = ({ image, name, roasted, ingredient, sizes, onDelete 
                 <FlatList
                     style={styles.sizesContainer}
                     data={data}
-                    renderItem={({ item }) => <SizeCart size={item.size} price={item.price} style={styles.sizeContainer} />}
+                    renderItem={({ item }) =>
+                        <SizeCart
+                            size={item.size}
+                            price={item.price}
+                            style={styles.sizeContainer}
+                            incrementQuantity={() => dispatch(incrementQuantity({ id: id, size: item.size }))}
+                            decrementQuantity={() => dispatch(decrementQuantity({ id: id, size: item.size }))}
+                            id={id}
+                            quantity={item.quantity}
+                        />
+                    }
                     keyExtractor={item => item.size + item.price}
                     ItemSeparatorComponent={() => (<View style={{ height: 6 }}></View>)}
                     scrollEnabled={false}

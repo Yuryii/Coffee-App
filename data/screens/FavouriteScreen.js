@@ -25,6 +25,7 @@ const styles = StyleSheet.create({
     flex: 1,
     backgroundColor: Color.background,
     padding: wp(5),
+    paddingTop: 0,
     gap: hp(2)
   }
 })

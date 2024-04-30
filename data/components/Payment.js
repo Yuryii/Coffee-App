@@ -5,15 +5,18 @@ import { widthPercentageToDP as wp, heightPercentageToDP as hp } from 'react-nat
 import { FontAwesome5 } from '@expo/vector-icons';
 import Color from '../theme/Color';
 
-const Payment = ({ prices, name, icon, onPress, isSelected }) => {
+const Payment = ({ amount, name, icon, onPress, isSelected }) => {
     return (
         <TouchableOpacity onPress={onPress} style={isSelected ? styles.selected : null}>
-            <LinearGradient style={[styles.container, ]} start={{ x: 0, y: 0 }} end={{ x: 1, y: 0 }} colors={['#252A32', '#0C0F14']}>
+            <LinearGradient style={[styles.container,]} start={{ x: 0, y: 0 }} end={{ x: 1, y: 0 }} colors={['#252A32', '#0C0F14']}>
                 <View style={{ flexDirection: 'row', alignItems: 'center' }}>
                     <FontAwesome5 name={icon} size={wp(7)} color={Color.orangeTextHex} />
                     <Text style={styles.text}>{name}</Text>
                 </View>
-                <Text style={styles.text}>{prices}</Text>
+                <View style={{ flexDirection: 'row' }}>
+                    <Text style={styles.text}>{amount}</Text>
+                    <Text style={{ color: Color.orangeTextHex, fontSize: 11, alignSelf: 'flex-end' }}>  đ</Text>
+                </View>
             </LinearGradient>
         </TouchableOpacity>
     )

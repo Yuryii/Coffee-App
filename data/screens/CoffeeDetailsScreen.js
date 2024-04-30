@@ -9,7 +9,7 @@ import { MaterialCommunityIcons } from '@expo/vector-icons';
 import AddToCart from '../components/AddToCart';
 import { widthPercentageToDP as wp, heightPercentageToDP as hp } from 'react-native-responsive-screen';
 import { useDispatch } from 'react-redux'
-import { addSizeS, addSizeM, addSizeL } from '../../store/addCartToReducer';
+import { addCoffeeSize} from '../../store/addCartToReducer';
 import { useSelector } from 'react-redux';
 import { useUser } from "@clerk/clerk-react";
 import { getFirestore } from "firebase/firestore";
@@ -48,17 +48,7 @@ const CoffeeDetailsScreen = ({ route, navigation }) => {
   }, [cart]);
   const addToCart = () => {
     const idCoffee = coffee.id
-    switch (size) {
-      case 'S':
-        dispatch(addSizeS({ idCoffee }))
-        break;
-      case 'M':
-        dispatch(addSizeM({ idCoffee }))
-        break;
-      case 'L':
-        dispatch(addSizeL({ idCoffee }))
-        break;
-    }
+        dispatch(addCoffeeSize({ idCoffee, size }))
   }
   const handleChooseSize = (sizez) => {
     size === sizez ? setSize(null) : setSize(sizez)

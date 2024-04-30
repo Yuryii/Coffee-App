@@ -17,6 +17,7 @@ import { widthPercentageToDP as wp, heightPercentageToDP as hp } from 'react-nat
 import CustomDrawer from '../components/CustomDrawer';
 import AddScreen from '../screens/AddScreen';
 import { MaterialIcons } from '@expo/vector-icons';
+import DepositScreen from '../screens/DepositScreen';
 
 const Stack = createNativeStackNavigator()
 const Tab = createBottomTabNavigator();
@@ -98,13 +99,13 @@ export default function Navigation() {
         <NavigationContainer >
             <Drawer.Navigator
                 drawerContent={props => <CustomDrawer {...props} />}
-                screenOptions={{ 
-                    drawerLabelStyle: { marginLeft: -25, fontSize: 17 }, 
+                screenOptions={{
+                    drawerLabelStyle: { marginLeft: -25, fontSize: 17 },
                     drawerActiveBackgroundColor: 'white',
                     drawerActiveTintColor: 'black',
                     drawerInactiveTintColor: 'white',
-                } 
-            }
+                }
+                }
             >
                 <Drawer.Screen name='Home' component={ProductStack}
                     options={{
@@ -119,6 +120,13 @@ export default function Navigation() {
                     options={{
                         drawerIcon: ({ color, focused }) => (
                             <MaterialIcons name="add-box" size={24} color={focused ? "black" : "white"} />
+                        ),
+                        headerShown: false
+                    }} />
+                <Drawer.Screen name='Deposit' component={DepositScreen}
+                    options={{
+                        drawerIcon: ({ color, focused }) => (
+                            <MaterialIcons name="payment" size={24} color={focused ? "black" : "white"} />
                         ),
                         headerShown: false
                     }} />

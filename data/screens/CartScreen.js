@@ -11,23 +11,28 @@ import { useSelector } from 'react-redux'
 import { useState } from 'react'
 import { deleteItem } from '../../store/addCartToReducer'
 import { useDispatch } from 'react-redux'
+import { incrementQuantity } from '../../store/addCartToReducer'
+import { decrementQuantity } from '../../store/addCartToReducer'
+
 const CartScreen = ({ navigation }) => {
+  const statusUser = useSelector(state => state.userReducer.status)
+  const statusCart = useSelector(state => state.addCartToReducer.statusCart)
+  console.log('statusUser' + statusUser)
+  console.log('statusCart' + statusCart)
   const dispatch = useDispatch()
   const cart = useSelector((state) => state.addCartToReducer.cart)
   const [totalPrice, setTotalPrice] = useState(0)
   // total price cart
   useEffect(() => {
+    console.log(JSON.stringify(cart, null, 2))
     let totalPrice = 0;
      cart.forEach((item) => {
          item.price.forEach((price) => {
-           console.log('price.price' + price.price)
-           totalPrice += parseFloat(price.price)
+           totalPrice += parseFloat(price.price)  * price.quantity
        })
      })
-    console.log(totalPrice)
     totalPrice = totalPrice.toFixed(2)
     setTotalPrice(totalPrice)
-    console.log(JSON.stringify(cart, null, 2))
   }, [cart])
   const handleDeleteCart = (id) => {
     dispatch(deleteItem({ id }))
@@ -49,6 +54,7 @@ const CartScreen = ({ navigation }) => {
               ingredient={item.special_ingredients}
               roasted={item.roasted}
               onDelete={() => handleDeleteCart(item.id)}
+              id={item.id}
             />
             :
             <CoffeeCardOne
@@ -58,6 +64,9 @@ const CartScreen = ({ navigation }) => {
               image={item.imageLink_square}
               price={item.price[0].price} 
               onDelete={() => handleDeleteCart(item.id)}
+              quantity={item.price[0].quantity}
+              incrementQuantity={() => dispatch(incrementQuantity({ id: item.id, size: item.price[0].size }))}
+              decrementQuantity={() => dispatch(decrementQuantity({ id: item.id, size: item.price[0].size }))}
               />
         )}
         keyExtractor={item => item.id}
@@ -66,7 +75,7 @@ const CartScreen = ({ navigation }) => {
         )
         }
       />
-      <AddToCart title='Total Price' price={totalPrice} textButton='Pay' onPress={() => cart.length === 0 ? alert('123') : navigation.navigate('PaymentScreen', { price: totalPrice })} />
+      <AddToCart title='Total Price' price={totalPrice} textButton='Pay' onPress={() => cart.length === 0 ? alert('Mua ???') : navigation.navigate('PaymentScreen', { price: totalPrice })} />
     </View>
   )
 }

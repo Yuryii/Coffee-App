@@ -2,6 +2,7 @@ import { createSlice, createAsyncThunk } from '@reduxjs/toolkit'
 import { fetchDataFromFirebase } from './rootReducer'
 import app from '../data/firebaseConfig';
 import getCartData from '../data/data/getCartData';
+import { increment } from 'firebase/firestore';
 export const fetchCartFromFirebase = createAsyncThunk(
   'data/cartData',
   async (email) => {
@@ -19,6 +20,8 @@ const initialState = {
   error: null,
   statusCart: 'idle',
   errorCart: null,
+  coffeeSearched: [],
+  beansSearched: [],
 }
 
 export const addCartToReducer = createSlice({
@@ -26,46 +29,22 @@ export const addCartToReducer = createSlice({
   initialState,
   reducers: {
     resetState: () => initialState,
-    addSizeS: (state, action) => {
-      let id = action.payload.idCoffee;
-      const coffee = state.coffeData.find(item => item.id === id)
-      const coffeeHasBeenAddedToCart = state.cart.find(item => item.id === id)
-      if (!coffeeHasBeenAddedToCart) {
-        const coffeeS = coffee.price.filter(item => item.size === 'S')
-        const newCoffee = { ...coffee, price: [coffeeS[0]] };
-        state.cart = [...state.cart, newCoffee];
-      }
-      else {
-        const hasCoffeeAddedToCartSizeS = coffeeHasBeenAddedToCart.price.some(item => item.size === 'S');
-        if (hasCoffeeAddedToCartSizeS) {
-          alert('Sản phẩm với size này đã có rồi - tăng số lượng thêm 1');
-          return state;
-        }
-        else {
-          // Thêm size mới vào cùng sản phẩm
-          let sizeS = coffee.price[0];
-          const updatedCart = state.cart.map(item => {
-            if (item.id === id) {
-              return { ...item, price: [...item.price, sizeS] };
-            }
-            return item;
-          });
-          state.cart = updatedCart;
-        }
-      }
-    }
-     ,
-    addSizeM: (state, action) => {
+    deleteAllCart: (state) => {
+      state.cart = [];
+    },
+    addCoffeeSize: (state, action) => {
+      const size = action.payload.size;
       let id = action.payload.idCoffee;
       const coffee = state.coffeData.find(item => item.id === id)
       coffeeHasBeenAddedToCart = state.cart.find(item => item.id === id)
       if (!coffeeHasBeenAddedToCart) {
-        const coffeeM = coffee.price.filter(item => item.size === 'M')
-        const newCoffee = { ...coffee, price: [coffeeM[0]] }
+        const coffeeM = coffee.price.filter(item => item.size === size)
+        const newPrice = [{ ...coffeeM[0], quantity: 1 }]
+        const newCoffee = { ...coffee, price: newPrice };
         state.cart = [...state.cart, newCoffee]
       }
       else {
-        const hasCoffeeAddedToCartSizeM = coffeeHasBeenAddedToCart.price.some(item => item.size === 'M')
+        const hasCoffeeAddedToCartSizeM = coffeeHasBeenAddedToCart.price.some(item => item.size === size)
         if (hasCoffeeAddedToCartSizeM) {
           alert('san pham voi size nay da co roi- tang so luong them 1')
           return state;
@@ -73,110 +52,38 @@ export const addCartToReducer = createSlice({
         else {
           // add size moi vao cung san pham
           const newCoffee = state.coffeData.find(item => item.id === id)
-          const coffeeM = newCoffee.price.filter(item => item.size === 'M')
+          const coffeeM = newCoffee.price.filter(item => item.size === size)
+          const price = { ...coffeeM[0], quantity: 1 }
           const index = state.cart.findIndex(item => item.id === id)
-          state.cart[index].price = [...state.cart[index].price, coffeeM[0]]
-
-        }
-      }
-      
-    },
-    addSizeL: (state, action) => {
-      let id = action.payload.idCoffee;
-      const coffee = state.coffeData.find(item => item.id === id)
-      coffeeHasBeenAddedToCart = state.cart.find(item => item.id === id)
-      if (!coffeeHasBeenAddedToCart) {
-        const coffeeM = coffee.price.filter(item => item.size === 'L')
-        const newCoffee = { ...coffee, price: [coffeeM[0]] }
-        state.cart = [...state.cart, newCoffee]
-      }
-      else {
-        const hasCoffeeAddedToCartSizeM = coffeeHasBeenAddedToCart.price.some(item => item.size === 'L')
-        if (hasCoffeeAddedToCartSizeM) {
-          alert('san pham voi size nay da co roi- tang so luong them 1')
-          return state;
-        }
-        else {
-          // add size moi vao cung san pham
-          const newCoffee = state.coffeData.find(item => item.id === id)
-          const coffeeM = newCoffee.price.filter(item => item.size === 'L')
-          const index = state.cart.findIndex(item => item.id === id)
-          state.cart[index].price = [...state.cart[index].price, coffeeM[0]]
+          state.cart[index].price = [...state.cart[index].price, price]
 
         }
       }
     },
-    addSize250gm: (state, action) => {
+    addBeanSize: (state, action) => {
+      const size = action.payload.size;
       let id = action.payload.idBean;
-      const coffee = state.beans.find(item => item.id === id)
+      const coffee = state.beansData.find(item => item.id === id)
       coffeeHasBeenAddedToCart = state.cart.find(item => item.id === id)
       if (!coffeeHasBeenAddedToCart) {
-        const coffeeM = coffee.price.filter(item => item.size === '250gm')
-        const newCoffee = { ...coffee, price: [coffeeM[0]] }
+        const coffeeM = coffee.price.filter(item => item.size === size)
+        const newPrice = [{ ...coffeeM[0], quantity: 1 }]
+        const newCoffee = { ...coffee, price: newPrice };
         state.cart = [...state.cart, newCoffee]
       }
       else {
-        const hasCoffeeAddedToCartSizeM = coffeeHasBeenAddedToCart.price.some(item => item.size === '250gm')
+        const hasCoffeeAddedToCartSizeM = coffeeHasBeenAddedToCart.price.some(item => item.size === size)
         if (hasCoffeeAddedToCartSizeM) {
           alert('san pham voi size nay da co roi- tang so luong them 1')
           return state;
         }
         else {
           // add size moi vao cung san pham
-          const newCoffee = state.coffees.find(item => item.id === id)
-          const coffeeM = newCoffee.price.filter(item => item.size === '250gm')
+          const newCoffee = state.beansData.find(item => item.id === id)
+          const coffeeM = newCoffee.price.filter(item => item.size === size)
+          const price = { ...coffeeM[0], quantity: 1 }
           const index = state.cart.findIndex(item => item.id === id)
-          state.cart[index].price = [...state.cart[index].price, coffeeM[0]]
-
-        }
-      }
-    },
-    addSize500gm: (state, action) => {
-      let id = action.payload.idBean;
-      const coffee = state.beans.find(item => item.id === id)
-      coffeeHasBeenAddedToCart = state.cart.find(item => item.id === id)
-      if (!coffeeHasBeenAddedToCart) {
-        const coffeeM = coffee.price.filter(item => item.size === '500gm')
-        const newCoffee = { ...coffee, price: [coffeeM[0]] }
-        state.cart = [...state.cart, newCoffee]
-      }
-      else {
-        const hasCoffeeAddedToCartSizeM = coffeeHasBeenAddedToCart.price.some(item => item.size === '500gm')
-        if (hasCoffeeAddedToCartSizeM) {
-          alert('san pham voi size nay da co roi- tang so luong them 1')
-          return state;
-        }
-        else {
-          // add size moi vao cung san pham
-          const newCoffee = state.coffees.find(item => item.id === id)
-          const coffeeM = newCoffee.price.filter(item => item.size === '500gm')
-          const index = state.cart.findIndex(item => item.id === id)
-          state.cart[index].price = [...state.cart[index].price, coffeeM[0]]
-
-        }
-      }
-    },
-    addSize1000gm: (state, action) => {
-      let id = action.payload.idBean;
-      const coffee = state.beans.find(item => item.id === id)
-      coffeeHasBeenAddedToCart = state.cart.find(item => item.id === id)
-      if (!coffeeHasBeenAddedToCart) {
-        const coffeeM = coffee.price.filter(item => item.size === '1000gm')
-        const newCoffee = { ...coffee, price: [coffeeM[0]] }
-        state.cart = [...state.cart, newCoffee]
-      }
-      else {
-        const hasCoffeeAddedToCartSizeM = coffeeHasBeenAddedToCart.price.some(item => item.size === '1000gm')
-        if (hasCoffeeAddedToCartSizeM) {
-          alert('san pham voi size nay da co roi- tang so luong them 1')
-          return state;
-        }
-        else {
-          // add size moi vao cung san pham
-          const newCoffee = state.coffees.find(item => item.id === id)
-          const coffeeM = newCoffee.price.filter(item => item.size === '1000gm')
-          const index = state.cart.findIndex(item => item.id === id)
-          state.cart[index].price = [...state.cart[index].price, coffeeM[0]]
+          state.cart[index].price = [...state.cart[index].price, price]
 
         }
       }
@@ -184,6 +91,43 @@ export const addCartToReducer = createSlice({
     deleteItem: (state, action) => {
       const id = action.payload.id;
       state.cart = state.cart.filter(item => item.id !== id);
+    },
+    incrementQuantity: (state, action) => {
+      const size = action.payload.size;
+      const id = action.payload.id;
+      const index = state.cart.findIndex(item => item.id === id);
+      const price = state.cart[index].price;
+      const indexPrice = price.findIndex(item => item.size === size);
+      state.cart[index].price[indexPrice].quantity += 1///;
+    },
+    decrementQuantity: (state, action) => {
+      const id = action.payload.id;
+      const index = state.cart.findIndex(item => item.id === id);
+
+      // Check if item exists in the cart
+      if (index !== -1) {
+        const price = state.cart[index].price;
+        const indexPrice = price.findIndex(item => item.size === action.payload.size);
+        if (state.cart[index].price.length === 1) {
+          if (state.cart[index].price[indexPrice].quantity === 1) {
+            // delele item in cart
+            state.cart = state.cart.filter(item => item.id !== id);
+          }
+          else {
+            state.cart[index].price[indexPrice].quantity -= 1;
+          }
+        }
+        else {
+          if (state.cart[index].price[indexPrice].quantity === 1) {
+            // delete size in item
+            state.cart[index].price = state.cart[index].price.filter(item => item.size !== action.payload.size);
+          }
+          else {
+            // decreate quantity
+            state.cart[index].price[indexPrice].quantity -= 1;
+          }
+        }
+      }
     }
   },
   extraReducers: (builder) => {
@@ -217,6 +161,6 @@ export const addCartToReducer = createSlice({
 })
 
 // Action creators are generated for each case reducer function
-export const { addSizeS, addSizeM, addSizeL, addSize250gm, getUser, resetState, deleteItem } = addCartToReducer.actions
+export const { getUser, resetState, deleteItem, incrementQuantity, decrementQuantity, addBeanSize, addCoffeeSize, deleteAllCart } = addCartToReducer.actions
 
 export default addCartToReducer.reducer

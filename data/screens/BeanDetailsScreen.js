@@ -10,7 +10,7 @@ import { FontAwesome6 } from '@expo/vector-icons';
 import { useEffect } from 'react';
 import { useDispatch } from 'react-redux';
 import { useSelector } from 'react-redux';
-
+import { addBeanSize } from '../../store/addCartToReducer';
 import {widthPercentageToDP as wp, heightPercentageToDP as hp} from 'react-native-responsive-screen';
 const CoffeeDetailsScreen = ({ route, navigation }) => {
   const beanData = useSelector(state => state.rootReducer.beansData)
@@ -18,19 +18,8 @@ const CoffeeDetailsScreen = ({ route, navigation }) => {
   const [size, setSize] = useState('250gm')
   const dispatch = useDispatch()
   const handleAddBean = () => {
-    const id = coffee.id;
-    switch(id)
-    {
-      case '250gm':
-      dispatch(addSize250gm(id))  
-      break;
-      case '500gm':
-      dispatch(addSize1000gm(id))  
-      break;
-      case '1000gm':
-      dispatch(addSize1000gm(id))  
-      break;
-    }
+    const idBean = coffee.id;
+    dispatch(addBeanSize({idBean,size})) 
   }
   const handleChooseSize = (s) => {
     size === s ? setSize(null) : setSize(s)

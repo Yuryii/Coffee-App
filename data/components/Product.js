@@ -67,11 +67,11 @@ const styles = StyleSheet.create({
     borderBottomLeftRadius: 26,
     borderTopEndRadius: 20,
     padding: 4,
+    width: 48.5,
     backgroundColor: '#000000',
     opacity: 0.7
   },
   rating: {
-    marginLeft: 8,
     fontWeight: '500',
     fontSize: 10
   },

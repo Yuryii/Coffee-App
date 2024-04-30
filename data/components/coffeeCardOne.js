@@ -8,7 +8,7 @@ import { widthPercentageToDP as wp, heightPercentageToDP as hp } from 'react-nat
 import { Swipeable } from 'react-native-gesture-handler';
 import { AntDesign } from '@expo/vector-icons';
 import { useDispatch } from 'react-redux';
-const CoffeeCardOne = ({ image, name, size, price, description, onDelete }) => {
+const CoffeeCardOne = ({ image, name, size, price, description, onDelete, incrementQuantity, decrementQuantity, quantity }) => {
     const rightSwipe = () => {
         return (
             <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center', backgroundColor: 'red', borderRadius: 25 }}>
@@ -45,7 +45,7 @@ const CoffeeCardOne = ({ image, name, size, price, description, onDelete }) => {
                                     {price}
                                 </Text>
                             </View>
-                            <Quantity />
+                            <Quantity incrementQuantity={incrementQuantity} decrementQuantity={decrementQuantity} quantity={quantity}/>
                         </View>
                     </View>
                 </View>

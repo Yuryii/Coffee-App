@@ -8,9 +8,9 @@ import { useState } from 'react';
 import { ScrollView, TextInput, TouchableOpacity } from 'react-native-gesture-handler';
 import { getStorage, ref, uploadBytes, getDownloadURL } from "firebase/storage";
 import { getFirestore, addDoc, collection } from "firebase/firestore";
-
+import HeaderTabNavigationCustom from '../components/headerTabNavigationCustom';
 import app from '../firebaseConfig';
-const AddScreen = () => {
+const AddScreen = ({ navigation }) => {
     const db = getFirestore(app);
     const storage = getStorage();
     const [imageSquare, setImageSquare] = useState(null);
@@ -76,6 +76,7 @@ const AddScreen = () => {
     }
     return (
         <View style={styles.container}>
+            <HeaderTabNavigationCustom screenName="Add" onPress={() => navigation.openDrawer()} />
             <Formik
                 initialValues=
                 {{
@@ -231,7 +232,7 @@ const AddScreen = () => {
                             {
                                 isloading
                                     ?
-                                    <View  style={styles.button}>
+                                    <View style={styles.button}>
                                         <ActivityIndicator size="large" color={Color.whiteHex} />
                                     </View>
                                     :

@@ -2,11 +2,17 @@ import { View, Text, StyleSheet, TextInput } from 'react-native'
 import React from 'react'
 import Color from '../theme/Color'
 import { AntDesign } from '@expo/vector-icons';
-const Search = () => {
+const Search = ({ text, handleChangeText }) => {
     return (
         <View style={styles.search}>
             <AntDesign name="search1" size={20} color={Color.greyTextHex} />
-            <TextInput multiline placeholder='Find Your Coffee...' style={styles.searchText} placeholderTextColor={Color.greyTextHex}></TextInput>
+            <TextInput
+                placeholder='Find Your Coffee...'
+                style={styles.searchText}
+                placeholderTextColor={Color.greyTextHex}
+                value={text}
+                onChangeText={txt => handleChangeText(txt)}>
+            </TextInput>
         </View>
     )
 }

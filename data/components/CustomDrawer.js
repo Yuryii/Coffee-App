@@ -10,13 +10,19 @@ import { useUser } from "@clerk/clerk-react";
 import { useAuth } from "@clerk/clerk-expo";
 import {useDispatch} from 'react-redux';
 import { resetState } from '../../store/addCartToReducer';
+import { useSelector } from 'react-redux';
+import {resetUser} from '../../store/userReducer'
+import { resetHistory } from '../../store/historyReducer';
 
 const CustomDrawer = (props) => {
+    const money = useSelector(state => state.userReducer.userMoney)
     const dispatch = useDispatch();
     const { isLoaded, signOut } = useAuth();
     const handleSignOut = async () => {
         await signOut();
-        dispatch(resetState())
+        dispatch(resetState());
+        dispatch(resetUser());
+        dispatch(resetHistory());
     }
     if (!isLoaded) {
         return null;
@@ -37,12 +43,12 @@ const CustomDrawer = (props) => {
                         source={{ uri: image }}
                         style={{ width: 90, height: 90, borderRadius: 90 / 2 }}
                     />
-                    <Text style={{ color: 'white' }}>
+                    <Text style={{ color: 'white', fontSize: 16, fontWeight: '600' }}>
                         {name}
                     </Text>
-                    <View style={{ flexDirection: 'row', gap: 10 }}>
-                        <Text style={{ color: 'white' }}>280 Coins</Text>
-                        <FontAwesome6 name="coins" size={24} color={Color.orangeTextHex} />
+                    <View style={{ flexDirection: 'row', gap: 10, alignItems: 'center' }}>
+                        <Text style={{ color: 'white' }}>{money} VNĐ</Text>
+                        <FontAwesome6 name="money-bill-wave" size={24} color={Color.orangeTextHex} />
                     </View>
                 </View>
             </LinearGradient>
