@@ -9,9 +9,10 @@ import { StatusBar } from 'react-native'
 import { useState } from 'react'
 import { useDispatch } from 'react-redux'
 import { widthPercentageToDP } from 'react-native-responsive-screen'
-import { removeCheckedHistory } from '../../store/historyReducer'
+import { removeCheckedHistory, resetDeleteHistory } from '../../store/historyReducer'
 import { addCheckedHistory } from '../../store/historyReducer'
-const OrderHistoryScreen = () => {
+
+const OrderHistoryScreen = ({ navigation }) => {
   const dispatch = useDispatch();
   const [isEdit, setEdit] = useState(false);
   const historyData = useSelector(state => state.historyReducer.history)
@@ -21,12 +22,19 @@ const OrderHistoryScreen = () => {
   const handleSelectAll = () => {
     historyData.forEach((item) => {
       item.history.forEach((historyItem) => {
-        dispatch(addCheckedHistory({ id: historyItem.id }));
+        dispatch(addCheckedHistory({ date: item.date, id: historyItem.id }));
       })
     }
     )
   }
-
+  useEffect(() => {
+    const unsubcribe = navigation.addListener('blur', () => {
+      if (!isEdit)
+        setEdit(false)
+      dispatch(resetDeleteHistory())
+    })
+    return unsubcribe
+  }, [navigation])
   return (
     <View style={styles.container}>
       <StatusBar backgroundColor={Color.background} />
@@ -55,23 +63,23 @@ const OrderHistoryScreen = () => {
             <Text style={[styles.textWhiteTitle, { textAlign: 'center', fontSize: 16 }]}>No Order History</Text>
         }
       </View>
-        <FlatList
+      <FlatList
         contentContainerStyle={{ paddingBottom: 50 }}
-          data={historyData}
-          renderItem={({ item }) =>
-            <HistoryItem date={item.date} history={item.history} onEdit={isEdit} />
-          }
-        />
-        {historyData.length > 0
-          ?
-          isEdit
-          &&
-          <TouchableOpacity onPress={handleDeleteAllHistory} style={{ alignItems: 'center', justifyContent: 'center', padding: 15, borderRadius: 10, backgroundColor: Color.orangeTextHex, marginBottom: 30 }}>
-            <Text style={{ color: Color.whiteHex, fontSize: 20 }}>Delete</Text>
-          </TouchableOpacity>
-          :
-          null
+        data={historyData}
+        renderItem={({ item }) =>
+          <HistoryItem date={item.date} history={item.history} onEdit={isEdit} />
         }
+      />
+      {historyData.length > 0
+        ?
+        isEdit
+        &&
+        <TouchableOpacity onPress={handleDeleteAllHistory} style={{ alignItems: 'center', justifyContent: 'center', padding: 15, borderRadius: 10, backgroundColor: Color.orangeTextHex, marginBottom: 30 }}>
+          <Text style={{ color: Color.whiteHex, fontSize: 20 }}>Delete</Text>
+        </TouchableOpacity>
+        :
+        null
+      }
     </View>
   )
 }

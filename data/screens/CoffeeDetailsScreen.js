@@ -15,6 +15,7 @@ import { useUser } from "@clerk/clerk-react";
 import { getFirestore } from "firebase/firestore";
 import { collection, getDocs, query, where, updateDoc, addDoc, doc } from "firebase/firestore";
 import app from '../firebaseConfig';
+
 const CoffeeDetailsScreen = ({ route, navigation }) => {
   const cart = useSelector(state => state.addCartToReducer.cart)
   const { user } = useUser();
@@ -25,6 +26,8 @@ const CoffeeDetailsScreen = ({ route, navigation }) => {
   const coffee = coffeData.find(x => x.id === route.params.id)
   const [size, setSize] = useState('S')
   const [price, setPrice] = useState(0)
+  const average_rating = coffee.review.reduce((acc, item) => acc + item.rate, 0) / coffee.review.length
+  const ratingCount = coffee.review.length
   useEffect(() => {
     const cartCollectionRef = collection(db, 'cart');
     getDocs(query(cartCollectionRef, where('email', '==', email)))
@@ -95,11 +98,11 @@ const CoffeeDetailsScreen = ({ route, navigation }) => {
           </View>
         </View>
         <View style={styles.bodyInformation}>
-          <View style={styles.ratingContainer}>
+          <TouchableOpacity style={styles.ratingContainer} onPress={() => navigation.navigate("AllReviewScreen", {id: route.params.id})}>
             <AntDesign name="star" size={24} color={Color.orangeTextHex} />
-            <Text style={[{ color: Color.whiteHex }]}>{coffee.average_rating}</Text>
-            <Text style={[styles.typeText]}>({coffee.ratings_count})</Text>
-          </View>
+            <Text style={[{ color: Color.whiteHex }]}>{!average_rating ? 0 : average_rating}</Text>
+            <Text style={[styles.typeText]}>({ratingCount})</Text>
+          </TouchableOpacity>
           <View style={[styles.type, { paddingHorizontal: 31, paddingVertical: 17 }]}>
             <Text style={styles.typeText}>{coffee.roasted}</Text>
           </View>
@@ -137,6 +140,7 @@ const CoffeeDetailsScreen = ({ route, navigation }) => {
             )}
           />
         </View>
+        
         <AddToCart title='Price' price={price} textButton='Add to Cart' onPress={addToCart} />
       </View>
     </View>

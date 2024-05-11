@@ -68,7 +68,6 @@ const AddScreen = ({ navigation }) => {
         });
         values.imageLink_square = await getDownloadURL(storageRef)
         values.imageLink_portrait = await getDownloadURL(storageRef2)
-        console.log(values)
         // add values to firebase
         const docRef = await addDoc(collection(db, "Product"), values);
         ToastAndroid.show('Product Added', ToastAndroid.SHORT)
@@ -94,6 +93,7 @@ const AddScreen = ({ navigation }) => {
                     ],
                     average_rating: '0',
                     ratings_count: '0',
+                    review: [],
                     type: '',
                 }}
                 onSubmit={(values) => {

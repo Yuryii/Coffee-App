@@ -38,6 +38,8 @@ const CoffeeDetailsScreen = ({ route, navigation }) => {
         break;
     }
   },[size])
+  const average_rating = coffee.review.reduce((acc, item) => acc + item.rate, 0) / coffee.review.length
+  const ratingCount = coffee.review.length
   return (
     <View style={styles.container}>
       <Image source={{uri: coffee.imageLink_portrait}} style={{ position: 'absolute', width: '100%', height: '61%' }} />
@@ -67,11 +69,11 @@ const CoffeeDetailsScreen = ({ route, navigation }) => {
           </View>
         </View>
         <View style={styles.bodyInformation}>
-          <View style={styles.ratingContainer}>
+          <TouchableOpacity style={styles.ratingContainer} onPress={() => navigation.navigate("AllReviewScreen", {id: route.params.id})}>
             <AntDesign name="star" size={24} color={Color.orangeTextHex} />
-            <Text style={[{ color: Color.whiteHex }]}>{coffee.average_rating}</Text>
-            <Text style={[styles.typeText]}>({coffee.ratings_count})</Text>
-          </View>
+            <Text style={[{ color: Color.whiteHex }]}>{average_rating}</Text>
+            <Text style={[styles.typeText]}>({ratingCount})</Text>
+          </TouchableOpacity>
           <View style={[styles.type, { paddingHorizontal: 27, paddingVertical: 17 }]}>
             <Text style={styles.typeText}>{coffee.roasted}</Text>
           </View>

@@ -13,6 +13,7 @@ import { resetState } from '../../store/addCartToReducer';
 import { useSelector } from 'react-redux';
 import {resetUser} from '../../store/userReducer'
 import { resetHistory } from '../../store/historyReducer';
+import { FontAwesome } from '@expo/vector-icons';
 
 const CustomDrawer = (props) => {
     const money = useSelector(state => state.userReducer.userMoney)
@@ -47,8 +48,8 @@ const CustomDrawer = (props) => {
                         {name}
                     </Text>
                     <View style={{ flexDirection: 'row', gap: 10, alignItems: 'center' }}>
-                        <Text style={{ color: 'white' }}>{money} VNĐ</Text>
-                        <FontAwesome6 name="money-bill-wave" size={24} color={Color.orangeTextHex} />
+                        <Text style={{ color: 'white' }}>{money.toFixed(2)}</Text>
+                        <FontAwesome name="dollar" size={20} color={Color.orangeTextHex}/>
                     </View>
                 </View>
             </LinearGradient>

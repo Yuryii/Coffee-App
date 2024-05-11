@@ -18,7 +18,8 @@ import CustomDrawer from '../components/CustomDrawer';
 import AddScreen from '../screens/AddScreen';
 import { MaterialIcons } from '@expo/vector-icons';
 import DepositScreen from '../screens/DepositScreen';
-
+import ReviewScreen from '../screens/ReviewScreen';
+import AllReviewScreen from '../screens/AllReviewScreen';
 const Stack = createNativeStackNavigator()
 const Tab = createBottomTabNavigator();
 const Drawer = createDrawerNavigator();
@@ -27,9 +28,11 @@ const ProductStack = () => {
     return (
         <Stack.Navigator >
             <Stack.Screen name="HomeTab" component={MainTab} options={{ headerShown: false }} />
+            <Stack.Screen name="ReviewScreen" component={ReviewScreen} options={{ headerShown: false }} />
             <Stack.Screen name="BeanDetailScreen" component={BeanDetailsScreen} options={{ headerShown: false }} />
             <Stack.Screen name="CoffeeDetailScreen" component={CoffeeDetailsScreen} options={{ headerShown: false }} />
             <Stack.Screen name="PaymentScreen" component={PaymentScreen} options={{ headerShown: false }} />
+            <Stack.Screen name='AllReviewScreen' component={AllReviewScreen} options={{ headerShown: false }} />
         </Stack.Navigator>
     )
 }
@@ -73,9 +76,6 @@ const MainTab = () => {
                     } else if (route.name === 'CartScreen') {
                         iconName = focused ? 'shopping-cart' : 'shopping-cart';
                     }
-                    else if (route.name === 'FavouriteStack') {
-                        iconName = focused ? 'heart' : 'heart';
-                    }
                     else if (route.name === 'OrderHistoryStack') {
                         iconName = focused ? 'bell' : 'bell-o';
                     }
@@ -88,7 +88,6 @@ const MainTab = () => {
         >
             <Tab.Screen name="HomeScreen" component={HomeScreen} />
             <Tab.Screen name="CartScreen" component={CartScreen} />
-            <Tab.Screen name="FavouriteStack" component={FavouriteStack} />
             <Tab.Screen name="OrderHistoryStack" component={OrderHistoryStack} />
         </Tab.Navigator>
     )

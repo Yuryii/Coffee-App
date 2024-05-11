@@ -1,4 +1,4 @@
-import { View, Text, StyleSheet, Image, StatusBar, ActivityIndicator, SafeAreaView } from 'react-native'
+import { View, Text, StyleSheet, Image, StatusBar, ActivityIndicator, SafeAreaView, Button } from 'react-native'
 import Color from '../theme/Color';
 import { FlatList } from 'react-native-gesture-handler';
 import Search from '../components/Search';
@@ -21,8 +21,19 @@ import { searchItem } from '../../store/rootReducer';
 import { setUserEmail } from '../../store/userReducer';
 import historyReducer from '../../store/historyReducer';
 import { fetchHistoryFromFirebase } from '../../store/historyReducer';
-
+import { updateReviewInFirebase } from '../../store/rootReducer';
 const HomeScreen = ({ navigation }) => {
+  const data = useSelector(state => state.rootReducer.data)
+  // this function will update all review in firebase = [] it just for testing
+  const handleUpdateReviewAll = () => {
+    const idList = data.map((item) => {
+      return item.id
+    })
+    console.log(JSON.stringify(idList, null, 2))
+
+    dispatch(updateReviewInFirebase(idList))
+  }
+  // ------------------------------------------------------------
   const historyData = useSelector(state => state.historyReducer.history)
   const newEmail = useSelector(state => state.userReducer.userEmail)
   const money = useSelector(state => state.userReducer.userMoney)
@@ -35,7 +46,6 @@ const HomeScreen = ({ navigation }) => {
   const email = user.primaryEmailAddress.emailAddress;
   const db = getFirestore(app);
   const [searchText, setSearchText] = useState('');
-  const [initialRender, setInitialRender] = useState(true);
 
   useEffect(() => {
     const cartCollectionRef = collection(db, 'cart');
@@ -90,13 +100,13 @@ const HomeScreen = ({ navigation }) => {
           querySnapshot.forEach((doc) => {
             key = doc.id;
           })
-          updateDoc(doc(db, 'history', key), {email: email, history: historyData})
+          updateDoc(doc(db, 'history', key), { email: email, history: historyData })
             .then(() => {
             })
             .catch(error => console.error(error));
         }
         else if (querySnapshot.empty) {
-          addDoc(collection(db, 'history'), {email: email, history: historyData})
+          addDoc(collection(db, 'history'), { email: email, history: historyData })
         }
       });
   }, [historyData])
@@ -139,6 +149,7 @@ const HomeScreen = ({ navigation }) => {
                     price={item.price[0].price}
                     onPress={() => navigation.navigate('CoffeeDetailScreen', { id: item.id })}
                     add={() => addCoffeeToCart(item.id)}
+                    id={item.id}
                   />
                 )}
                 keyExtractor={item => item.id}
@@ -160,6 +171,7 @@ const HomeScreen = ({ navigation }) => {
                     price={item.price[0].price}
                     onPress={() => navigation.navigate('BeanDetailScreen', { id: item.id })}
                     add={() => addBeanToCart(item.id)}
+                    id={item.id}
                   />
                 )}
                 horizontal
@@ -168,6 +180,9 @@ const HomeScreen = ({ navigation }) => {
             </View>
           </View>
       }
+      {/* <View>
+        <Button title="Update review" onPress={handleUpdateReviewAll} />
+      </View> */}
     </SafeAreaView>
   )
 }

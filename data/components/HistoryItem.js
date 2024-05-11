@@ -1,5 +1,5 @@
 import { View, Text } from 'react-native'
-import React from 'react'
+import React, { useEffect } from 'react'
 import { StyleSheet } from 'react-native'
 import Color from '../theme/Color'
 import { LinearGradient } from 'expo-linear-gradient';
@@ -7,19 +7,37 @@ import { Image } from 'react-native'
 import { widthPercentageToDP as wp, heightPercentageToDP as hp } from 'react-native-responsive-screen';
 import { FlatList, TouchableOpacity } from 'react-native-gesture-handler';
 import Checkbox from 'expo-checkbox';
-import { useState, useEffect } from 'react';
 import { addCheckedHistory } from '../../store/historyReducer';
 import { useDispatch, useSelector } from 'react-redux';
-
+import { useNavigation } from '@react-navigation/native';
+import rootReducer from '../../store/rootReducer';
+import userReducer from '../../store/userReducer';
 // ...
 
 const HistoryItem = ({ date, history, onEdit }) => {
+    const email = useSelector(state => state.userReducer.userEmail);
+    const data = useSelector(state => state.rootReducer.data);
+    const isReviewed = (id) => { 
+        const product = data.find(item => item.id === id);
+        const index = product.review.findIndex(item => item.name === email);
+        console.log(index)
+        return  index === -1 ? true : false;
+    }
     const dispatch = useDispatch();
     const checkedItems = useSelector(state => state.historyReducer.deleteHistory);
 
     const handleChecked = (id, date) => {
         dispatch(addCheckedHistory({ id: id, date: date }));
     }
+    const isChecked = (id, date) => {
+        const indexDate = checkedItems.findIndex(item => item.date === date);
+        if (indexDate === -1) {
+            return false;
+        } else {
+            return checkedItems[indexDate].id.includes(id);
+        }
+    }
+    const navigation = useNavigation();
     return (
         <View style={styles.container}>
             <View>
@@ -45,9 +63,9 @@ const HistoryItem = ({ date, history, onEdit }) => {
                     data={history}
                     ItemSeparatorComponent={() => <View style={{ height: hp(2) }} />}
                     renderItem={({ item }) =>
-                        <View style={{ flexDirection: 'row', gap: wp(5)}}>
-                            {onEdit && <Checkbox value={checkedItems.includes(item.id)} onValueChange={() => handleChecked(item.id, item.date)} />}
-                            <TouchableOpacity>
+                        <View style={{ flexDirection: 'row', gap: wp(5) }}>
+                            {onEdit && <Checkbox value={isChecked(item.id, date)} onValueChange={() => handleChecked(item.id, date)} />}
+                            <TouchableOpacity onPress={() => navigation.navigate('AllReviewScreen', { id: item.id })}>
                                 <LinearGradient
                                     style={styles.itemContainer}
                                     colors={['#252A32', '#0C0F14']}
@@ -83,7 +101,6 @@ const HistoryItem = ({ date, history, onEdit }) => {
                                                                 <Text style={{ color: Color.orangeTextHex, alignItems: 'center', fontSize: wp(5), fontWeight: 'bold' }}>$</Text>
                                                                 <Text style={{ fontSize: wp(5), color: 'white', fontWeight: '500' }}>{item.price}</Text>
                                                             </View>
-
                                                         </View>
                                                     </View>
                                                     <View style={{ flexDirection: 'row', alignItems: 'center', gap: wp(1) }}>
@@ -101,6 +118,25 @@ const HistoryItem = ({ date, history, onEdit }) => {
                                             }
                                         />
                                     </View>
+                                    {
+                                        isReviewed(item.id) &&
+                                        <View>
+                                            <Text style={{ color: Color.whiteHex, textAlign: 'center' }}>We warmly welcome your feedback to help us enhance the quality of our product and service !</Text>
+                                            <View style={{ flexDirection: 'row', justifyContent: 'center', gap: wp(7) }}>
+                                                <TouchableOpacity 
+                                                    onPress={() => navigation.navigate('AllReviewScreen', { id: item.id })}
+                                                style={{ backgroundColor: Color.whiteHex, alignItems: 'center', padding: wp(3), borderRadius: wp(3), width: wp(34) }}>
+                                                    <Text style={{ fontSize: 16, color: 'black', }}>All Review</Text>
+                                                </TouchableOpacity>
+                                                <TouchableOpacity
+                                                    style={{ backgroundColor: Color.orangeTextHex, alignItems: 'center', padding: wp(3), borderRadius: wp(3), width: wp(34) }}
+                                                    onPress={() => navigation.navigate('ReviewScreen', { id: item.id })}
+                                                >
+                                                    <Text style={{ fontSize: 16, color: Color.whiteHex, }}>Evaluate</Text>
+                                                </TouchableOpacity>
+                                            </View>
+                                        </View>
+                                    }
                                 </LinearGradient>
                             </TouchableOpacity>
                         </View>

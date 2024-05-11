@@ -20,30 +20,44 @@ const historySlice = createSlice({
     name: 'historyReducer',
     initialState,
     reducers: {
+        resetDeleteHistory: (state) => {
+            state.deleteHistory = []
+        },
         resetHistory: () => initialState,
         addHistory: (state, action) => {
             state.history.push(action.payload.history);
             console.log(state.history);
         },
         addCheckedHistory: (state, action) => {
-            if (state.deleteHistory.includes(action.payload.id)) {
-                state.deleteHistory = state.deleteHistory.filter((item) => item !== action.payload.id);
-                return;
+            if (state.deleteHistory.length === 0) {
+                state.deleteHistory.push({ date: action.payload.date, id: [action.payload.id] });
+            } else {
+                const indexDate = state.deleteHistory.findIndex(item => item.date === action.payload.date);
+                if (indexDate === -1) {
+                    state.deleteHistory.push({ date: action.payload.date, id: [action.payload.id] });
+                } else {
+                    if (!state.deleteHistory[indexDate].id.includes(action.payload.id)) {
+                        state.deleteHistory[indexDate].id.push(action.payload.id);
+                    } else {
+                        state.deleteHistory[indexDate].id = state.deleteHistory[indexDate].id.filter(id => id !== action.payload.id);
+                        if (state.deleteHistory[indexDate].id.length === 0) {
+                            //delete this object
+                            state.deleteHistory.splice(indexDate, 1);
+                        }
+                    }
+                }
             }
-            state.deleteHistory.push(action.payload.id);
             console.log(state.deleteHistory);
         },
         removeCheckedHistory: (state, action) => {
-            console.log(state.deleteHistory);
-            state.history = state.history.map((item) => {
-                return {
-                    ...item,
-                    history: item.history.filter((historyItem) => !state.deleteHistory.includes(historyItem.id))
-                }
-            }).filter((item) => item.history.length > 0);
-
-
-            state.deleteHistory = [];
+            state.history = state.history.map(historyItem => {
+                const filteredHistory = historyItem.history.filter(subHistoryItem =>
+                    !state.deleteHistory.some(deleteHistoryItem =>
+                        deleteHistoryItem.date = historyItem.date && deleteHistoryItem.id.includes(subHistoryItem.id)
+                    )
+                )
+                return { date: historyItem.date, history: filteredHistory };
+            }).filter(item => item.history.length > 0);
         }
     },
     extraReducers: (builder) => {
@@ -63,6 +77,7 @@ const historySlice = createSlice({
     },
 });
 
-export const { addHistory, resetHistory, addCheckedHistory, removeCheckedHistory } = historySlice.actions;
+export const { addHistory, resetHistory, addCheckedHistory, removeCheckedHistory, resetDeleteHistory } = historySlice.actions;
 
 export default historySlice.reducer;
+

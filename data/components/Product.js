@@ -1,11 +1,16 @@
 import { View, Text, Image, StyleSheet } from 'react-native'
 import React from 'react'
-import CoffeeData from '../data/CoffeeData'
 import { LinearGradient } from 'expo-linear-gradient';
 import { AntDesign } from '@expo/vector-icons';
 import Color from '../theme/Color';
 import { TouchableOpacity } from 'react-native-gesture-handler';
-const Product = ({ rating, image, name, ingredient, price, onPress, add }) => {
+import { useSelector } from 'react-redux';
+import rootReducer from '../../store/rootReducer';
+const Product = ({  image, name, ingredient, price, onPress, add, id }) => {
+  const data = useSelector(state => state.rootReducer.data)
+  const product = data.find(item => item.id === id)
+  const average_rating = product.review.reduce((acc, item) => acc + item.rate, 0) / product.review.length
+
   return (
     <TouchableOpacity onPress={onPress}>
       <LinearGradient
@@ -16,7 +21,7 @@ const Product = ({ rating, image, name, ingredient, price, onPress, add }) => {
         <Image source={{ uri: image }} style={styles.image} />
         <View style={styles.ratingContainer} >
           <AntDesign name="star" size={10} color={Color.orangeTextHex} style={{ marginLeft: 8 }} />
-          <Text style={[styles.rating, styles.text]}>{rating}</Text>
+          <Text style={[styles.rating, styles.text]}>{!average_rating ? 0 : average_rating}</Text>
         </View>
         <Text style={[styles.name, styles.text]}>
           {name}
